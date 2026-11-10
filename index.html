@@ -166,6 +166,35 @@ main{position:relative}.stream{padding:16px 16px 84px}.stream h1{font-size:22px;
 .reel-dots button:before{content:"";height:4px;width:6px;background:#ffffff90;border-radius:4px}.reel-dots [aria-current=true]:before{background:white;width:19px}
 .reel-toggle{background:#13231bc7;border:1px solid #ffffff60;border-radius:18px;font-size:12px;min-height:32px;padding:0 10px}
 @media(prefers-reduced-motion:reduce){.region-reel .topic-photo{transition:none}}
+/* Community discussions use warm surfaces. The atlas has its own map and legend. */
+main header>.series{display:none}
+main[data-area="community"]{--green:#964426;--paper:#fff9f2;--line:#eadbcf}
+main[data-area="community"] header{background:#fff8ed;border-color:#edcfb7}
+main[data-area="community"] #app{background:#f3e7d8}
+.stream{padding:12px 13px 84px}
+.stream .region-reel{margin-bottom:14px}
+.stream .feed-heading{background:#f9d5b5;color:#49271c;padding:14px;border-radius:15px}
+.stream .feed-heading h1{margin-bottom:8px}
+.stream .stream-filters{margin:0}.stream-filters button{background:#fff4e8;color:#603b2d}
+.stream-filters button[aria-pressed=true],main[data-area="community"] #composeFloat{background:#954426}
+.stream .note-card{margin-top:12px;padding:15px;background:#fffdf9;border:1px solid #e6d4c4;border-radius:15px}
+.stream .note-card .place-link{background:#fae8d5;color:#703b23}
+main[data-area="atlas"]:not([data-land]){--paper:#e3eef0;--line:#b9d1d6;--green:#185363}
+main[data-area="atlas"]:not([data-land]) header{background:#163f50;color:#fff;border:0}
+main[data-area="atlas"]:not([data-land]) #app{background:#e3eef0}
+.atlas-index h1{color:#143f4d;font-size:28px}
+.atlas-index .toggle{margin:14px 0 12px;background:#c9dee1}
+.atlas-index .toggle button{color:#244c54;min-height:42px}
+.atlas-index .toggle .chosen{background:#185363;color:white}
+.atlas-index .mapbox{background-color:#f6fbfa;background-image:linear-gradient(#2353640d 1px,transparent 1px),linear-gradient(90deg,#2353640d 1px,transparent 1px);background-size:22px 22px;border:1px solid #a5c5ca;border-radius:18px;padding:4px}
+.atlas-index .region-keys,.atlas-index details.drawer{background:#fff;border:1px solid #bed1d3;border-radius:14px;padding:13px;margin:12px 0}
+.atlas-index .region-keys h2{font-size:18px;margin-bottom:8px}
+.region-keys div{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.region-keys button{display:flex;align-items:center;justify-content:center;gap:6px;border-radius:7px;min-height:38px;color:#173e49;background:#f1f6f5}
+.region-keys i{width:11px;height:11px;border-radius:50%;background:var(--key)}
+main[data-area="friends"] #app{background:#eaf2e9}
+main[data-area="friends"] .chatrow,main[data-area="friends"] .mc{background:#fff;border:1px solid #cfded0;border-radius:12px;padding:12px;margin:8px 0}
+main[data-area="personal"] #app{background:#f2edf3}
 </style>
 <script>
 (function(){
@@ -185,6 +214,7 @@ main{position:relative}.stream{padding:16px 16px 84px}.stream h1{font-size:22px;
   function photos(x){return localImg[x.id]?.length?uploads(x.id):mkPhotos(pubPhoto(x))}
   function mkPhotos(nums){return nums.length?mkG(nums):''}
   let origin=null,formPlace=null,fromForumDetail=null;
+  mapMode=true;
   const app=$('app'),main=document.querySelector('main');
   const compose=document.createElement('button');compose.id='composeFloat';compose.hidden=true;main.append(compose);
   function filters(){return '<div class="stream-filters">'+cats.map((c,i)=>'<button aria-pressed="'+(i===filter)+'" onclick="editionFilter('+i+')">'+E(c)+'</button>').join('')+'</div>'}
@@ -203,7 +233,8 @@ main{position:relative}.stream{padding:16px 16px 84px}.stream h1{font-size:22px;
   function mountReel(root){
     const slides=features.map(({region,image,id})=>{
       const slide=document.createElement('button');
-      slide.className='topic-photo';slide.innerHTML=jpg(image)+'<span><small>'+E(region)+'</small><strong>'+E(base.find(x=>x.id===id).t)+'</strong></span>';
+      slide.className='topic-photo';slide.innerHTML=jpg(image)+'<span><strong>'+E(base.find(x=>x.id===id).t)+'</strong></span>';
+      slide.setAttribute('aria-label',region+'，'+base.find(x=>x.id===id).t);
       slide.onclick=()=>editionRead(id);root.append(slide);return slide;
     });
     const controls=document.createElement('div');controls.className='reel-controls';
@@ -231,7 +262,7 @@ main{position:relative}.stream{padding:16px 16px 84px}.stream h1{font-size:22px;
   }
   function feed(){const list=posts().filter(x=>!filter||x.c===filter);const show=!filter;
     const rows=show?list.filter(x=>x.id!==2):list;
-    app.innerHTML='<section class="stream"><section class="region-reel" aria-label="各地生活图集" aria-roledescription="轮播"></section><h1>大家在聊</h1>'+filters()+rows.slice(0,homeLimit).map(card).join('')+(rows.length>homeLimit?B('再看几条','moreHome()','soft full'):'')+'</section>';
+    app.innerHTML='<section class="stream"><section class="region-reel" aria-label="各地生活图集" aria-roledescription="轮播"></section><div class="feed-heading"><h1>大家在聊</h1>'+filters()+'</div>'+rows.slice(0,homeLimit).map(card).join('')+(rows.length>homeLimit?B('再看几条','moreHome()','soft full'):'')+'</section>';
     mountReel(app.querySelector('.region-reel'));
   }
   function returnSource(){if(!origin)return home(0);const saved=origin;placeId=saved.placeId;topicId=saved.topicId;region=groupOf(placeId);origin=null;route(saved.page,2)}
@@ -244,13 +275,34 @@ main{position:relative}.stream{padding:16px 16px 84px}.stream h1{font-size:22px;
     const panel=document.createElement('section');panel.className='related';panel.innerHTML='<h3>'+E(places[key][0])+'的讨论</h3>'+matches.map(x=>B(E(x.t)+'　›','editionRead('+x.id+',true)','topic-open')).join('');const ask=document.createElement('button');ask.textContent='＋ 问问这里的朋友';ask.onclick=()=>begin(true);panel.append(ask);const foot=host.querySelector('.folio');host.insertBefore(panel,foot||null);
   }
   const legacy=paint;
+  function styleAtlas(){
+    const pad=app.querySelector('.pad');pad.classList.add('atlas-index');
+    pad.querySelector('h1').textContent='地方文化地图';
+    const buttons=pad.querySelectorAll('.toggle button');
+    buttons[0].textContent='地区卡片';buttons[1].textContent='中国地图';
+    pad.querySelector('.toggle').prepend(buttons[1]);
+    const map=pad.querySelector('.mapbox');if(!map)return;
+    const keys=document.createElement('section');keys.className='region-keys';
+    keys.innerHTML='<h2>按大区找</h2><div></div>';
+    atlas.forEach((area,i)=>{const button=document.createElement('button');
+      const color=map.querySelector('.land.r'+i)?.getAttribute('fill')||area[4];
+      button.style.setProperty('--key',color);button.innerHTML='<i aria-hidden="true"></i>'+E(area[0]);
+      button.onclick=()=>locate(i);keys.lastChild.append(button)});
+    map.after(keys);
+  }
+  function stripTitleExtras(){
+    app.querySelectorAll('.series,.tiny,.folio,.rhero small,.rc small,.locbutton small,.piclabel,.aiLabel,.gallerytitle small,.pad>.stamp,.seaHero .seaMono,.sentDay>.seaMono,.bookCard>.seaMono,.paperHead span:last-child,.seaHero>p,.atlas-index>h1+p,.scard small').forEach(el=>el.remove());
+    if(page==='chat')app.querySelector('.pad>p.small')?.remove();
+    if(page==='theme')app.querySelector('.placeShot figcaption')?.remove();
+  }
   paint=function(){
     tearDownReel();tearDownReel=()=>{};
     legacy();
     compose.hidden=!['home','circle'].includes(page);
     compose.textContent=page==='circle'?'＋ 发动态':'＋ 发话题';
     compose.onclick=()=>page==='circle'?route('momentNew',1):begin(false);
-    const bar=document.querySelector('header>.series');bar.textContent=page.startsWith('sea')?'海上邮局':['首页','好友','地方手册','我的'][tab]||'';
+    main.dataset.area=['community','friends','atlas','personal','sea'][tab];
+    if(page==='discover')styleAtlas();
     if(page==='home')feed();
     if(page==='place'||page==='theme'){related();if(page==='place'&&fromForumDetail!==null){const btn=app.querySelector('.back');btn.textContent='‹　回到讨论';btn.onclick=()=>{const id=fromForumDetail;fromForumDetail=null;read(id)}}}
     if(page==='detail'){
@@ -272,6 +324,7 @@ main{position:relative}.stream{padding:16px 16px 84px}.stream h1{font-size:22px;
       if(isCircle)pad.style.paddingBottom='80px';
     }
     if(page==='mine'){const note=app.querySelector('.notice');if(note)note.textContent='此版本用于体验。帖子、好友和私信保存在当前浏览器。'}
+    stripTitleExtras();
   };
   const oldHome=home;home=function(i){origin=null;fromForumDetail=null;formPlace=null;oldHome(i)};
   paint();

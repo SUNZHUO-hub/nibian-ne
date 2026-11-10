@@ -166,35 +166,48 @@ main{position:relative}.stream{padding:16px 16px 84px}.stream h1{font-size:22px;
 .reel-dots button:before{content:"";height:4px;width:6px;background:#ffffff90;border-radius:4px}.reel-dots [aria-current=true]:before{background:white;width:19px}
 .reel-toggle{background:#13231bc7;border:1px solid #ffffff60;border-radius:18px;font-size:12px;min-height:32px;padding:0 10px}
 @media(prefers-reduced-motion:reduce){.region-reel .topic-photo{transition:none}}
-/* Community discussions use warm surfaces. The atlas has its own map and legend. */
+/* Shared paper, ink and surface colors across the four main destinations. */
+:root{
+  --canvas:#f3f1e9;--surface:#fffdf7;--wash:#e5ece2;--soft-wash:#f0f3eb;
+  --forest:#315649;--text:#223a31;--edge-soft:#d9dfd2;--card-radius:15px;
+}
+body{background:#e3e5db}
 main header>.series{display:none}
-main[data-area="community"]{--green:#964426;--paper:#fff9f2;--line:#eadbcf}
-main[data-area="community"] header{background:#fff8ed;border-color:#edcfb7}
-main[data-area="community"] #app{background:#f3e7d8}
-.stream{padding:12px 13px 84px}
-.stream .region-reel{margin-bottom:14px}
-.stream .feed-heading{background:#f9d5b5;color:#49271c;padding:14px;border-radius:15px}
+main[data-area]:not([data-land]):not(.seaActive){
+  --green:var(--forest);--paper:var(--surface);--line:var(--edge-soft);color:var(--text)
+}
+main[data-area]:not([data-land]):not(.seaActive) #app{background-color:var(--canvas)}
+main[data-area]:not([data-land]):not(.seaActive) :is(header,nav){
+  background:var(--surface);border-color:var(--edge-soft);color:var(--text)
+}
+main[data-area]:not([data-land]):not(.seaActive) nav .on{color:var(--forest)}
+.stream{padding:14px 16px 84px}.stream .region-reel{margin-bottom:14px}
+.stream .feed-heading{background:var(--wash);padding:14px;border-radius:var(--card-radius)}
 .stream .feed-heading h1{margin-bottom:8px}
-.stream .stream-filters{margin:0}.stream-filters button{background:#fff4e8;color:#603b2d}
-.stream-filters button[aria-pressed=true],main[data-area="community"] #composeFloat{background:#954426}
-.stream .note-card{margin-top:12px;padding:15px;background:#fffdf9;border:1px solid #e6d4c4;border-radius:15px}
-.stream .note-card .place-link{background:#fae8d5;color:#703b23}
-main[data-area="atlas"]:not([data-land]){--paper:#e3eef0;--line:#b9d1d6;--green:#185363}
-main[data-area="atlas"]:not([data-land]) header{background:#163f50;color:#fff;border:0}
-main[data-area="atlas"]:not([data-land]) #app{background:#e3eef0}
-.atlas-index h1{color:#143f4d;font-size:28px}
-.atlas-index .toggle{margin:14px 0 12px;background:#c9dee1}
-.atlas-index .toggle button{color:#244c54;min-height:42px}
-.atlas-index .toggle .chosen{background:#185363;color:white}
-.atlas-index .mapbox{background-color:#f6fbfa;background-image:linear-gradient(#2353640d 1px,transparent 1px),linear-gradient(90deg,#2353640d 1px,transparent 1px);background-size:22px 22px;border:1px solid #a5c5ca;border-radius:18px;padding:4px}
-.atlas-index .region-keys,.atlas-index details.drawer{background:#fff;border:1px solid #bed1d3;border-radius:14px;padding:13px;margin:12px 0}
+.stream .stream-filters{margin:0}
+.stream-filters button,.region-keys button{background:var(--surface);color:var(--forest)}
+.stream-filters button[aria-pressed=true],#composeFloat{background:var(--forest)}
+.stream .note-card,.atlas-index .region-keys,.atlas-index details.drawer,
+main[data-area="friends"] :is(.chatrow,.mc),main[data-area="personal"] .panel{
+  background:var(--surface);border:1px solid var(--edge-soft);border-radius:var(--card-radius)
+}
+.stream .note-card{margin-top:12px;padding:15px}
+.stream .note-card .place-link{background:var(--soft-wash);color:var(--forest)}
+.atlas-index h1{color:var(--text);font-size:28px}
+.atlas-index .toggle{margin:14px 0 12px;background:var(--wash)}
+.atlas-index .toggle button{color:var(--forest);min-height:42px}
+.atlas-index .toggle .chosen{background:var(--forest);color:white}
+.atlas-index .mapbox{background-color:var(--surface);background-image:linear-gradient(#4466530c 1px,transparent 1px),linear-gradient(90deg,#4466530c 1px,transparent 1px);background-size:22px 22px;border:1px solid var(--edge-soft);border-radius:var(--card-radius);padding:4px}
+.atlas-index .region-keys,.atlas-index details.drawer{padding:13px;margin:12px 0}
 .atlas-index .region-keys h2{font-size:18px;margin-bottom:8px}
 .region-keys div{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
-.region-keys button{display:flex;align-items:center;justify-content:center;gap:6px;border-radius:7px;min-height:38px;color:#173e49;background:#f1f6f5}
+.region-keys button{display:flex;align-items:center;justify-content:center;gap:6px;border-radius:7px;min-height:38px;background:var(--soft-wash)}
 .region-keys i{width:11px;height:11px;border-radius:50%;background:var(--key)}
-main[data-area="friends"] #app{background:#eaf2e9}
-main[data-area="friends"] .chatrow,main[data-area="friends"] .mc{background:#fff;border:1px solid #cfded0;border-radius:12px;padding:12px;margin:8px 0}
-main[data-area="personal"] #app{background:#f2edf3}
+main[data-area="friends"] :is(.chatrow,.mc){padding:13px;margin:9px 0}
+main[data-area="personal"] .panel{color:var(--text);background:var(--wash)}
+main[data-area="personal"] .pad>.subarea{background:var(--surface);border:1px solid var(--edge-soft);border-radius:11px;padding:13px;margin:7px 0}
+.edition-switch{background:var(--wash);border:0;padding:4px;border-radius:12px;gap:4px}
+.edition-switch button{flex:1;border-radius:9px}.edition-switch button[aria-current]{border:0;background:var(--surface);color:var(--forest)}
 </style>
 <script>
 (function(){

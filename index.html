@@ -157,6 +157,15 @@ main{position:relative}.stream{padding:16px 16px 84px}.stream h1{font-size:22px;
 .note-card{border-top:1px solid var(--line);padding:16px 0}.note-card .author{flex-wrap:wrap}.note-card .topic-open{width:100%;display:block;text-align:left;padding:9px 0 0}.topic-open h3{font-size:18px;line-height:1.45;margin-bottom:5px}.topic-open p{font-size:14px;color:#57635b;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.note-meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:12px;color:#59675f}.place-link{padding:4px 8px;border-radius:6px;background:#eef0e7;color:#2d513c}
 #composeFloat{position:absolute;z-index:3;bottom:calc(66px + env(safe-area-inset-bottom));right:16px;background:#224938;color:white;border-radius:22px;padding:11px 17px;font-weight:700;box-shadow:0 3px 14px #193c3338}
 #composeFloat[hidden]{display:none}.edition-switch{display:flex;border-bottom:1px solid var(--line);gap:16px;margin-bottom:14px}.edition-switch button{font-size:17px;padding:7px 1px}.edition-switch [aria-current]{border-bottom:3px solid var(--green);font-weight:bold}.related{margin:16px 0;background:var(--pane,#eff1e7);padding:12px;border-radius:12px}.related h3{margin:0 0 7px}.related button{display:block;width:100%;text-align:left;padding:8px 2px}.related button:last-child{color:var(--green);font-weight:bold}
+.region-reel{position:relative;isolation:isolate;overflow:hidden;border-radius:15px;background:#243f33;height:clamp(192px,53vw,224px);margin-bottom:20px;touch-action:pan-y}
+.region-reel .topic-photo{position:absolute;inset:0;height:100%;margin:0;border-radius:0;opacity:0;pointer-events:none;transition:opacity .48s ease}
+.region-reel .topic-photo.is-current{opacity:1;pointer-events:auto;z-index:1}
+.region-reel .topic-photo span{padding:16px 16px 40px;background:linear-gradient(180deg,transparent 18%,#08140d33 40%,#08140de6 100%)}
+.reel-controls{position:absolute;z-index:2;inset:auto 12px 5px;display:flex;align-items:center;justify-content:space-between;color:white;pointer-events:none}
+.reel-dots{display:flex}.reel-controls button{pointer-events:auto;color:inherit}.reel-dots button{width:25px;height:32px;padding:0;display:grid;place-items:center}
+.reel-dots button:before{content:"";height:4px;width:6px;background:#ffffff90;border-radius:4px}.reel-dots [aria-current=true]:before{background:white;width:19px}
+.reel-toggle{background:#13231bc7;border:1px solid #ffffff60;border-radius:18px;font-size:12px;min-height:32px;padding:0 10px}
+@media(prefers-reduced-motion:reduce){.region-reel .topic-photo{transition:none}}
 </style>
 <script>
 (function(){
@@ -183,9 +192,47 @@ main{position:relative}.stream{padding:16px 16px 84px}.stream h1{font-size:22px;
   window.editionPlace=i=>{fromForumDetail=page==='detail'?cur:null;openPlace(i)};
   window.editionRead=(id,linked=false)=>{origin=linked?{page,placeId,topicId}:null;read(id)};
   function card(x){const id=placeOf(x);return '<article class="note-card">'+author(x.p)+'<button class="topic-open" onclick="editionRead('+x.id+')"><h3>'+E(x.t)+'</h3><p>'+E(x.v)+'</p></button>'+photos(x)+'<div class="note-meta">'+(places[id]?B(E(places[id][0])+' · '+cats[x.c], 'editionPlace('+id+')','place-link'):E(cats[x.c]))+B(cm(x).length?'看 '+cm(x).length+' 条回答':'写下第一个回答','editionRead('+x.id+')','act')+'</div></article>'}
-  function feed(){const list=posts().filter(x=>!filter||x.c===filter);const feature=base.find(x=>x.id===2);const show=!filter;
+  const features=[
+    {region:'呼和浩特',image:13,id:2},
+    {region:'哈尔滨',image:0,id:200},
+    {region:'泉州',image:31,id:4},
+    {region:'云南',image:56,id:3},
+    {region:'新疆',image:22,id:212}
+  ];
+  let reelIndex=0,paused=matchMedia('(prefers-reduced-motion: reduce)').matches,tearDownReel=()=>{};
+  function mountReel(root){
+    const slides=features.map(({region,image,id})=>{
+      const slide=document.createElement('button');
+      slide.className='topic-photo';slide.innerHTML=jpg(image)+'<span><small>'+E(region)+'</small><strong>'+E(base.find(x=>x.id===id).t)+'</strong></span>';
+      slide.onclick=()=>editionRead(id);root.append(slide);return slide;
+    });
+    const controls=document.createElement('div');controls.className='reel-controls';
+    controls.innerHTML='<div class="reel-dots"></div><button class="reel-toggle"></button>';root.append(controls);
+    const dots=features.map(({region},i)=>{
+      const dot=document.createElement('button');dot.setAttribute('aria-label','切换到'+region);
+      dot.onclick=()=>select(i);controls.firstChild.append(dot);return dot;
+    });
+    let timer,visible=true,startX,startY,suppressClick=false;
+    function schedule(){clearTimeout(timer);if(visible&&!paused&&!document.hidden)timer=setTimeout(()=>select(reelIndex+1),5200)}
+    function select(index){
+      reelIndex=(index+slides.length)%slides.length;
+      slides.forEach((slide,i)=>{const active=i===reelIndex;slide.classList.toggle('is-current',active);slide.inert=!active;slide.setAttribute('aria-hidden',String(!active));dots[i].setAttribute('aria-current',String(active))});
+      controls.lastChild.textContent=paused?'播放':'暂停';controls.lastChild.setAttribute('aria-label',paused?'播放轮播':'暂停轮播');schedule();
+    }
+    controls.lastChild.onclick=()=>{paused=!paused;select(reelIndex)};
+    root.addEventListener('focusin',e=>{if(e.target.matches(':focus-visible')&&!paused){paused=true;select(reelIndex)}});
+    root.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;startY=e.touches[0].clientY;suppressClick=false;clearTimeout(timer)},{passive:true});
+    root.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX,dy=e.changedTouches[0].clientY-startY;if(Math.abs(dx)>35&&Math.abs(dx)>Math.abs(dy)){suppressClick=true;select(reelIndex+(dx<0?1:-1))}else schedule()},{passive:true});
+    root.addEventListener('touchcancel',schedule);
+    root.addEventListener('click',e=>{if(suppressClick){e.preventDefault();e.stopPropagation();suppressClick=false}},true);
+    const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;schedule()},{root:app});
+    observer.observe(root);document.addEventListener('visibilitychange',schedule);select(reelIndex);
+    tearDownReel=()=>{clearTimeout(timer);observer.disconnect();document.removeEventListener('visibilitychange',schedule)};
+  }
+  function feed(){const list=posts().filter(x=>!filter||x.c===filter);const show=!filter;
     const rows=show?list.filter(x=>x.id!==2):list;
-    app.innerHTML='<section class="stream">'+(show?'<button class="topic-photo" onclick="editionRead(2)">'+jpg(13)+'<span><small>呼和浩特 · 阿远家的早饭</small><strong>'+E(feature.t)+'</strong></span></button>':'')+'<h1>大家在聊</h1>'+filters()+rows.slice(0,homeLimit).map(card).join('')+(rows.length>homeLimit?B('再看几条','moreHome()','soft full'):'')+'</section>';
+    app.innerHTML='<section class="stream"><section class="region-reel" aria-label="各地生活图集" aria-roledescription="轮播"></section><h1>大家在聊</h1>'+filters()+rows.slice(0,homeLimit).map(card).join('')+(rows.length>homeLimit?B('再看几条','moreHome()','soft full'):'')+'</section>';
+    mountReel(app.querySelector('.region-reel'));
   }
   function returnSource(){if(!origin)return home(0);const saved=origin;placeId=saved.placeId;topicId=saved.topicId;region=groupOf(placeId);origin=null;route(saved.page,2)}
   function begin(associated){origin=associated?{page,placeId,topicId}:null;formPlace=associated?placeId:null;route('new',0);if(associated&&origin.page==='theme'){$('cat').value=topicId+1;$('title').value=places[placeId][1+2*topicId]}}
@@ -198,6 +245,7 @@ main{position:relative}.stream{padding:16px 16px 84px}.stream h1{font-size:22px;
   }
   const legacy=paint;
   paint=function(){
+    tearDownReel();tearDownReel=()=>{};
     legacy();
     compose.hidden=!['home','circle'].includes(page);
     compose.textContent=page==='circle'?'＋ 发动态':'＋ 发话题';

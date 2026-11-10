@@ -168,8 +168,9 @@ main{position:relative}.stream{padding:16px 16px 84px}.stream h1{font-size:22px;
 @media(prefers-reduced-motion:reduce){.region-reel .topic-photo{transition:none}}
 /* Shared paper, ink and surface colors across the four main destinations. */
 :root{
-  --canvas:#f3f1e9;--surface:#fffdf7;--wash:#e5ece2;--soft-wash:#f0f3eb;
-  --forest:#315649;--text:#223a31;--edge-soft:#d9dfd2;--card-radius:15px;
+  --canvas:#ece7db;--surface:#fffaf0;--wash:#e7e9e5;--soft-wash:#eff0e9;
+  --forest:#274a62;--text:#293a44;--edge-soft:#d3c9b8;--card-radius:5px;
+  --seal:#9c4235;--airmail:repeating-linear-gradient(122deg,#a64b3c 0 12px,#f9f1dd 12px 23px,#36596b 23px 35px,#f9f1dd 35px 46px);
 }
 body{background:#e3e5db}
 main header>.series{display:none}
@@ -208,6 +209,40 @@ main[data-area="personal"] .panel{color:var(--text);background:var(--wash)}
 main[data-area="personal"] .pad>.subarea{background:var(--surface);border:1px solid var(--edge-soft);border-radius:11px;padding:13px;margin:7px 0}
 .edition-switch{background:var(--wash);border:0;padding:4px;border-radius:12px;gap:4px}
 .edition-switch button{flex:1;border-radius:9px}.edition-switch button[aria-current]{border:0;background:var(--surface);color:var(--forest)}
+body{background:#dedbd1}
+main:not(.seaActive) header{position:relative;padding:13px 18px 12px}
+main:not(.seaActive) header:after{content:"";position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--airmail)}
+.brand{color:var(--forest);font:800 23px/1.2 SimSun,"Songti SC",serif;letter-spacing:.02em}
+.brand i{position:relative;width:25px;height:18px;padding:0;border:1.6px solid var(--seal);border-radius:2px;background:linear-gradient(32deg,transparent 48%,var(--seal) 49% 54%,transparent 55%) left top/51% 75% no-repeat,linear-gradient(-32deg,transparent 48%,var(--seal) 49% 54%,transparent 55%) right top/51% 75% no-repeat;font-size:0}
+.stream{padding-top:17px}.stream .region-reel{border-radius:3px;background:var(--surface);border:1px solid #c7bda9;height:clamp(272px,75vw,315px);box-shadow:2px 4px 0 #d7cebb;margin:0 1px 23px}
+.region-reel .topic-photo{display:grid;grid-template-rows:minmax(0,1fr) auto;align-content:stretch;text-align:left;background:var(--surface);color:var(--forest);padding:8px 8px 46px}
+.region-reel .topic-photo img{min-height:0;object-position:center 48%}
+.region-reel .topic-photo span{position:static;padding:10px 5px 1px;background:none;display:block}
+.region-reel .topic-photo strong{font:700 clamp(18px,5.4vw,23px)/1.35 SimSun,"Songti SC",serif;letter-spacing:.01em}
+.postmark{position:absolute;right:17px;top:15px;display:grid;place-content:center;min-width:57px;height:57px;padding:5px;border-radius:50%;border:3px double currentColor;color:#fff8e8;background:#204257b8;font:700 12px/1.15 SimSun,serif;transform:rotate(10deg);text-align:center}
+.postmark:before,.postmark:after{content:"";width:20px;border-top:1px solid currentColor;margin:4px auto}
+.reel-controls{color:var(--forest);inset:auto 10px 6px;justify-content:flex-end}
+.reel-dots button:before{background:#b8c2c3}.reel-dots [aria-current=true]:before{background:var(--seal)}
+.reel-dots button{width:19px}.reel-dots [aria-current=true]:before{width:15px}
+.reel-toggle{background:none;color:var(--forest);border:1px solid #c7c4b8;border-radius:4px;padding:0 5px;margin-left:4px}
+.mail-signature{position:absolute;left:14px;bottom:14px;right:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--seal);font:600 13px/1.3 SimSun,"Songti SC",serif}
+.stream .feed-heading{padding:0 0 9px;background:none;border-radius:0;border-bottom:2px solid var(--forest)}
+.stream h1,.atlas-index h1,.pad>h1,.pad>.spread h1{color:var(--forest);font-family:SimSun,"Songti SC",serif}
+.stream-filters button,.atlas-index .toggle,.atlas-index .toggle button,.edition-switch,.edition-switch button{border-radius:4px}
+.stream .note-card,.atlas-index .region-keys,.atlas-index details.drawer{border-radius:4px;box-shadow:0 2px 0 #d6cfbf}
+.note-meta{border-top:1px dashed var(--edge-soft);padding-top:7px}
+.stream .note-card .place-link{background:transparent;border:1px solid #c3aaa0;border-radius:2px;color:var(--seal)}
+#composeFloat{border-radius:7px;background:var(--seal)}
+.atlas-index .mapbox{border:5px solid var(--surface);outline:1px solid var(--edge-soft);border-radius:1px;background-color:#f8f0df;box-shadow:2px 4px 0 #d6cfbf}
+.atlas-index .mapbox .cn text{fill:#243e4e}
+main[data-area="friends"] .chatrow{margin:0;padding:15px 10px;border-width:0 0 1px;border-style:dashed;border-radius:0;border-color:#c3bba9}
+main[data-area="friends"] .chatrow .av{border:3px dotted var(--surface);border-radius:3px;outline:1px solid #bcb6a8}
+main[data-area="personal"] .panel,.postcard-back{background-color:var(--surface);border-radius:3px;box-shadow:2px 4px 0 #d6cfbf;border:1px solid var(--edge-soft);border-top:5px solid transparent;border-image:var(--airmail) 6 0 0 / 5px 0 0}
+.postcard-back{padding:15px 16px 19px;margin:6px 0 15px;position:relative}
+.postcard-back .detailTitle{color:var(--forest);font:700 24px/1.4 SimSun,"Songti SC",serif;margin:3px 0 10px}
+.postcard-back .copy{line-height:30px;background:repeating-linear-gradient(transparent 0 29px,#dbd4c6 29px 30px);margin:12px 0 0;padding:0 0 1px}
+.postcard-back .mail-stamp{float:right;width:49px;height:59px;object-fit:cover;border:4px dotted #fffaf0;outline:1px solid #b7ad98;margin:1px 0 8px 11px;transform:rotate(4deg)}
+.oldLetter .paperHead{border-bottom:1px dashed #876440}.oldLetter .signed{color:#794333}
 </style>
 <script>
 (function(){
@@ -246,7 +281,8 @@ main[data-area="personal"] .pad>.subarea{background:var(--surface);border:1px so
   function mountReel(root){
     const slides=features.map(({region,image,id})=>{
       const slide=document.createElement('button');
-      slide.className='topic-photo';slide.innerHTML=jpg(image)+'<span><strong>'+E(base.find(x=>x.id===id).t)+'</strong></span>';
+      const post=base.find(x=>x.id===id);
+      slide.className='topic-photo';slide.innerHTML=jpg(image)+'<b class="postmark">'+E(region)+'</b><span><strong>'+E(post.t)+'</strong></span><div class="mail-signature">'+E(region)+' · '+E(P[post.p][0])+' 寄</div>';
       slide.setAttribute('aria-label',region+'，'+base.find(x=>x.id===id).t);
       slide.onclick=()=>editionRead(id);root.append(slide);return slide;
     });
@@ -290,7 +326,7 @@ main[data-area="personal"] .pad>.subarea{background:var(--surface);border:1px so
   const legacy=paint;
   function styleAtlas(){
     const pad=app.querySelector('.pad');pad.classList.add('atlas-index');
-    pad.querySelector('h1').textContent='地方文化地图';
+    pad.querySelector('h1').textContent='来信地图';
     const buttons=pad.querySelectorAll('.toggle button');
     buttons[0].textContent='地区卡片';buttons[1].textContent='中国地图';
     pad.querySelector('.toggle').prepend(buttons[1]);
@@ -320,6 +356,10 @@ main[data-area="personal"] .pad>.subarea{background:var(--surface);border:1px so
     if(page==='place'||page==='theme'){related();if(page==='place'&&fromForumDetail!==null){const btn=app.querySelector('.back');btn.textContent='‹　回到讨论';btn.onclick=()=>{const id=fromForumDetail;fromForumDetail=null;read(id)}}}
     if(page==='detail'){
       const x=post(),n=placeOf(x);const response=$('response');if(response)response.placeholder='讲讲你家是怎么做的…';
+      const title=app.querySelector('.detailTitle'),body=app.querySelector('.copy'),sender=app.querySelector('.author');
+      const paper=document.createElement('article');paper.className='postcard-back';title.before(paper);
+      if(places[n])paper.innerHTML=jpg(locPhoto(n),'mail-stamp');
+      paper.append(title,sender,body);
       if(places[n])app.querySelector('.copy')?.insertAdjacentHTML('afterend',B('看看'+E(places[n][0])+'的地方手册　›','editionPlace('+n+')','place-link'));
       if(origin){const b=app.querySelector('.back');b.textContent='‹　'+places[origin.placeId][0];b.onclick=returnSource}
     }
@@ -331,12 +371,16 @@ main[data-area="personal"] .pad>.subarea{background:var(--surface);border:1px so
       const pad=app.querySelector('.pad');const isCircle=page==='circle';
       if(isCircle){pad.querySelector('.back')?.remove();pad.querySelector('.solid')?.remove();pad.querySelector('.small.gap')?.remove()}
       else{pad.querySelector('.circleEntry')?.remove()}
-      const h=pad.querySelector('h1');if(h)h.textContent='好友';
+      const h=pad.querySelector('h1');if(h)h.textContent=isCircle?'朋友圈':'通讯录';
       pad.querySelector('.series')?.remove();
       const sn=document.createElement('div');sn.className='edition-switch';sn.innerHTML='<button onclick="home(1)" '+(!isCircle?'aria-current="page"':'')+'>私信</button><button onclick="circle()" '+(isCircle?'aria-current="page"':'')+'>朋友圈</button>';const anchor=h?.closest('.spread')||h;anchor?.after(sn);
       if(isCircle)pad.style.paddingBottom='80px';
     }
-    if(page==='mine'){const note=app.querySelector('.notice');if(note)note.textContent='此版本用于体验。帖子、好友和私信保存在当前浏览器。'}
+    if(page==='mine'){app.querySelector('h1').textContent='我的邮册';const note=app.querySelector('.notice');if(note)note.textContent='此版本用于体验。帖子、好友和私信保存在当前浏览器。'}
+    if(page==='seaLetter'&&letter&&letter.s!==S.me){
+      const action=document.createElement('button');action.className='oBtn';action.textContent=friends(letter.s)?'给寄信人写私信':'认识寄信人';
+      action.onclick=()=>friends(letter.s)?openchat(letter.s):authorSea();app.querySelector('.letterBtns').prepend(action);
+    }
     stripTitleExtras();
   };
   const oldHome=home;home=function(i){origin=null;fromForumDetail=null;formPlace=null;oldHome(i)};

@@ -28,7 +28,7 @@ const P={a:['小满','南京','汉族','#f0d3ae'],b:['阿岚','黔东南','苗�
 {id:4,p:'e',c:3,t:'你在楼下坐一会儿，邻居会过来一起聊吗？',v:'小时候我以为每条街都这样：搬张小凳子坐下，就有人路过打招呼。换了住处才发现，认识邻居也有完全不同的方式。你现在住的地方呢？',r:[['c','我认识隔壁邻居，是从帮忙收一次快递开始的。']]}];
 const $=id=>document.getElementById(id), E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);let S;try{S=JSON.parse(localStorage.getItem('there.forum.v1')||'null')}catch{}S=S||{me:'a',posts:[],comments:{},friends:['a:e','b:d'],requests:[],msgs:{'a:e':[{s:'e',t:'你好呀！下次我来分享我们家过节的饭桌。',at:'09:10'}]},likes:{}};function sv(){try{localStorage.setItem('there.forum.v1',JSON.stringify(S))}catch{}}
 let page='home',tab=0,filter=0,cur=1,peer='b',replyTo='',previous='home',identityBack='home';const person=k=>P[k],posts=()=>[...S.posts,...base],post=()=>posts().find(x=>x.id===cur),pair=k=>[k,S.me].sort().join(':'),friends=k=>S.friends.includes(pair(k)),req=k=>S.requests.find(x=>[x.s,x.to].sort().join(':')===pair(k)),others=()=>Object.keys(P).filter(k=>k!==S.me),cm=x=>[...x.r.map(a=>({s:a[0],t:a[1]})),...(S.comments[x.id]||[])],inbox=()=>S.requests.filter(x=>x.to===S.me),B=(s,fn,cl='soft')=>'<button class="'+cl+'" onclick="'+fn+'">'+s+'</button>',icon=(i)=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'+['<path d="M3 4h18v13H11l-5 4v-4H3zM7 9h10M7 13h7"/>','<path d="M3 4h13v11H9l-5 3v-3H3zM18 8h3v12h-3v2l-4-2h-4"/>'][i]+'</svg>',av=(k,big=false)=>'<span class="av '+(big?'bigav':'')+'" style="background:'+P[k][3]+'">'+P[k][0].slice(-1)+'</span>',tags=k=>tagView(k),author=k=>B(av(k)+'<b>'+P[k][0]+'</b>'+tags(k),"profile('"+k+"')",'author');
-function route(p,t=tab){page=p;tab=t;paint();$('app').scrollTop=0;if(p==='chat')$('app').scrollTop=$('app').scrollHeight}function home(t){route(t?'friends':'home',t)}function filt(i){filter=i;paint()}function read(id){cur=id;replyTo='';route('detail',0)}function profile(k){previous=page;peer=k;route('profile')}function identity(){identityBack=page;route('identity')}function actAs(k){S.me=k;sv();home(tab)}function back(){if(page==='identity')route(identityBack);else if(page==='profile')route(previous);else if(page==='detail'||page==='new')home(0);else home(1)}function openchat(k){peer=k;if(friends(k))route('chat',1)}function sendRequest(){if(peer!==S.me&&!friends(peer)&&!req(peer))S.requests.push({s:S.me,to:peer});sv();paint()}function handle(k,accept){if(!inbox().some(x=>x.s===k))return;S.requests=S.requests.filter(x=>!(x.s===k&&x.to===S.me));if(accept&&!friends(k))S.friends.push(pair(k));sv();paint()}function like(){let key=S.me+':'+cur;S.likes[key]=!S.likes[key];sv();paint()}function chooseReply(k){replyTo=k;paint();$('response').focus()}function say(){let t=$('response').value.trim();if(!t)return $('response').focus();(S.comments[cur]??=[]).push({s:S.me,t,to:replyTo});sv();replyTo='';paint();$('app').scrollTop=$('app').scrollHeight}function addpost(){let t=$('title').value.trim(),v=$('txt').value.trim();if(!t||!v){$('err').textContent='请填写标题和正文。';return}let id=Date.now();S.posts.unshift({id,p:S.me,c:Number($('cat').value),t,v,r:[]});sv();filter=0;read(id)}function send(){let t=$('msg').value.trim();if(!t||!friends(peer))return;(S.msgs[pair(peer)]??=[]).push({s:S.me,t,at:new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})});sv();paint();$('app').scrollTop=$('app').scrollHeight;$('msg').focus()}
+function route(p,t=tab){page=p;tab=t;paint();$('app').scrollTop=0;if(p==='chat')$('app').scrollTop=$('app').scrollHeight}function home(t){route(t?'friends':'home',t)}function filt(i){filter=i;paint()}function read(id){cur=id;replyTo='';route('detail',0)}function profile(k){previous=page;peer=k;route('profile')}function identity(){identityBack=page;route('identity')}function actAs(k){S.me=k;sv();home(tab)}function back(){if(page==='identity')route(identityBack);else if(page==='profile')route(previous);else if(page==='detail'||page==='new')home(0);else home(1)}function openchat(k){peer=k;if(friends(k))route('chat',1)}function sendRequest(){if(peer!==S.me&&!friends(peer)&&!req(peer))S.requests.push({s:S.me,to:peer});sv();paint()}function handle(k,accept){if(!inbox().some(x=>x.s===k))return;S.requests=S.requests.filter(x=>!(x.s===k&&x.to===S.me));if(accept&&!friends(k))S.friends.push(pair(k));sv();paint()}function like(){let key=S.me+':'+cur;S.likes[key]=!S.likes[key];sv();paint()}function chooseReply(k){replyTo=k;paint();$('response').focus()}function say(){let t=$('response').value.trim();if(!t)return $('response').focus();(S.comments[cur]??=[]).push({s:S.me,t,to:replyTo});sv();replyTo='';paint();$('app').scrollTop=$('app').scrollHeight}function addpost(){let t=$('title').value.trim(),v=$('txt').value.trim();if(!t||!v){$('err').textContent='请填写标题和正文。';return}let id=Date.now();S.posts.unshift({id,p:S.me,c:Number($('cat').value),t,v,r:[]});sv();filter=0;read(id)}function send(){let t=$('msg').value.trim();if(!t||!friends(peer))return;(S.msgs[pair(peer)]??=[]).push({s:S.me,t,ts:Date.now(),at:new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})});sv();paint();$('app').scrollTop=$('app').scrollHeight;$('msg').focus()}
 function paint(){let h='',x=post(),who=S.me,foot=B('‹　返回','back()','back');$('nav').innerHTML=['首页','好友'].map((n,i)=>B(icon(i)+'<span>'+n+(i&&inbox().length?' <sup class="pillnum">'+inbox().length+'</sup>':'')+'</span>','home('+i+')',tab===i?'on':'')).join('');
 if(page==='home'){let list=posts().filter(x=>!filter||x.c===filter);h='<section class="hero" role="img" aria-label="不同地域青年与生活风景的摄影拼贴"><div class="heroTxt"><b class="edition">地方生活志　 VOL. 01</b><h1>风景之外，还有我们。</h1><p>一起聊聊，家乡生活里没写进攻略的那一面。</p></div></section><div class="pad"><div class="spread"><div><div class="series">COMMUNITY BOARD</div><h2>大家在聊</h2></div>'+B('＋ 发帖',"route('new')",'solid')+'</div><div class="tabs">'+cats.map((c,i)=>B(c,'filt('+i+')','chip '+(filter===i?'sel':''))).join('')+'</div>'+list.map((z,i)=>'<article class="post">'+author(z.p)+'<button class="topic" onclick="read('+z.id+')"><h3>'+E(z.t)+'</h3><p class="excerpt">'+E(z.v)+'</p><span class="foot"><span class="cat"># '+cats[z.c]+'</span><span>'+cm(z).length+' 条讨论　↗</span></span></button></article>').join('')+'<p class="notice">示例帖子与人物为虚构的个人视角，不代表地区或族群的统一习惯。</p></div>'}
 if(page==='detail'){h=foot+'<div class="stamp">话题现场　/　'+cats[x.c]+'</div><h1 class="detailTitle">'+E(x.t)+'</h1>'+author(x.p)+'<p class="copy">'+E(x.v)+'</p>'+B(S.likes[who+':'+cur]?'♥ 已共鸣':'♡ 有共鸣','like()')+'<div class="spread gap"><h2>评论区</h2><span class="tiny">'+cm(x).length+' REPLIES</span></div>'+cm(x).map(z=>'<article class="comment">'+author(z.s)+'<p>'+(z.to?'<small class="flag">回复 '+P[z.to][0]+'　</small>':'')+E(z.t)+'</p>'+B('回复',"chooseReply('"+z.s+"')",'act')+'</article>').join('')+'<label for="response">'+(replyTo?'回复 '+P[replyTo][0]+'　':'分享你那边的经历')+(replyTo?B('取消定向回复',"chooseReply('')",'act'):'')+'</label><textarea id="response" maxlength="500" placeholder="在我家……"></textarea>'+B('发表回复','say()','solid full')}
@@ -199,7 +199,11 @@ const mail = (() => {
   }
   function unwrap(){
     const item=first();if(!item)return home();
-    if(item.t)return open(item.t.id,'mailHome');
+    if(item.t){
+      open(item.t.id,'mailHome');
+      if(item.t.messages.length>1)$('app').querySelector('.mail-sheet:last-of-type')?.scrollIntoView({block:'start'});
+      return;
+    }
     const [s,p,topic,title,body,q]=item.row,t=make(s,S.me,topic,title,message(s,body,p,q));
     (db.opened[S.me]??=[]).push(s);db.threads.push(t);open(t.id,'mailHome');
   }
@@ -242,8 +246,11 @@ const mail = (() => {
   const navBack=(label,fn)=>'<div class="mail-toolbar">'+button('‹　'+label,fn)+'</div>';
   function front(){
     const item=first();
+    const returning=item?.t?.messages.length>1;
+    const coverTitle=returning?toName(item.s)+'回信了':E(item?.title);
+    const excerpt=returning?'<em class="reply-excerpt">'+E(item.t.messages.at(-1).body)+'</em>':'';
     return '<div class="mail-heading"><h1>远方来信</h1>'+button('往来信册','mail.book()')+'</div>'+
-      (item?'<button class="mail-cover" onclick="mail.unwrap()" aria-label="拆开来自'+E(item.place||'远方')+'的明信片"><span class="mail-photo">'+img(item.photo)+stamp(item.place)+'</span><span class="mail-address"><small>'+E(item.topic)+' · '+toName(item.s)+' 寄</small><strong>'+E(item.title)+'</strong><span>拆开来信</span></span></button>':'<section class="mail-sheet"><h2>今天的来信都拆过了</h2><p>去信册继续上次的话题，也可以寄出一张新明信片。</p></section>')+
+      (item?'<button class="mail-cover" onclick="mail.unwrap()" aria-label="'+(returning?'拆开'+toName(item.s)+'的回信':'拆开来自'+E(item.place||'远方')+'的明信片')+'"><span class="mail-photo">'+img(item.photo)+stamp(item.place)+'</span><span class="mail-address"><small>'+(returning?'关于《'+E(item.title)+'》':E(item.topic)+' · '+toName(item.s)+' 寄')+'</small><strong>'+coverTitle+'</strong>'+excerpt+'<span>'+(returning?'拆开回信':'拆开来信')+'</span></span></button>':'<section class="mail-sheet"><h2>今天的来信都拆过了</h2><p>去信册继续上次的话题，也可以寄出一张新明信片。</p></section>')+
       '<button class="mail-compose" onclick="mail.write(false)"><span class="mail-pencil" aria-hidden="true">✎</span><span><b>寄一张明信片</b><small>把家乡的一件小事，寄给异地的朋友</small></span></button>';
   }
   function book(){status='';route('mailBook',4)}
@@ -256,7 +263,8 @@ const mail = (() => {
   }
   function thread(){
     const t=current();if(!t)return front();const k=other(t),sent=t.messages.some(m=>m.s===S.me);
-    return navBack(backPage==='mailBook'?'往来信册':'来信',backPage==='mailBook'?'mail.book()':'mail.home()')+(status?'<p class="mail-status" role="status">'+E(status)+'</p>':'')+
+    const back=backPage==='chat'?navBack('回到私信',"openchat('"+k+"')"):backPage==='mailBook'?navBack('往来信册','mail.book()'):navBack('来信','mail.home()');
+    return back+(status?'<p class="mail-status" role="status">'+E(status)+'</p>':'')+
       '<h1>'+E(t.title)+'</h1>'+t.messages.map((m,i)=>'<article class="mail-sheet"><div class="mail-sender">'+av(m.s)+'<div><b>'+toName(m.s)+'</b><small>'+E(m.place||'未署地区')+' · '+(i?'回信':E(t.topic))+'</small></div></div>'+(m.photo!=null?'<figure>'+img(m.photo)+'</figure>':'')+'<p>'+E(m.body)+'</p>'+(m.question?'<blockquote>'+E(m.question)+'</blockquote>':'')+'</article>').join('')+
       (t.messages.at(-1).s!==S.me?button('回一张明信片','mail.write(true)','mail-primary'):'<p class="mail-empty">已寄给'+toName(k)+'，等对方回信。</p>')+
       (sent&&t.messages.length>1?button(friends(k)?'去好友私信':'认识'+toName(k),friends(k)?"openchat('"+k+"')":"profile('"+k+"')",'mail-secondary'):'');
@@ -264,7 +272,7 @@ const mail = (() => {
   function form(){
     const d=draft(),t=reply?current():null,last=t?.messages.at(-1);
     return navBack(reply?'原信':'来信',reply?'mail.cancel()':'mail.home()')+'<h1>'+(reply?'给'+toName(other(t))+'回信':'寄一张明信片')+'</h1><section class="mail-sheet">'+
-      (reply?'<blockquote>'+E(last.question||last.body)+'</blockquote>':'<fieldset><legend>这张聊什么？</legend>'+topics.map((v,i)=>'<button aria-pressed="'+(d.topic===v)+'" onclick="mail.topic('+i+')">'+v+'</button>').join('')+'</fieldset>')+
+      (reply?'<blockquote class="reply-prompt"><b>'+toName(last.s)+(last.question?'问你':'在上一张卡里写道')+'</b>'+E(last.question||last.body)+'</blockquote>':'<fieldset><legend>这张聊什么？</legend>'+topics.map((v,i)=>'<button aria-pressed="'+(d.topic===v)+'" onclick="mail.topic('+i+')">'+v+'</button>').join('')+'</fieldset>')+
       '<label for="mailText">'+(reply?'你那边呢？':'写一件家乡的小事')+'</label><textarea id="mailText" oninput="mail.sync()" maxlength="700" placeholder="'+(reply?'我家是这样过的……':prompts[topics.indexOf(d.topic)])+'">'+E(d.body)+'</textarea>'+
       (reply?'':'<label for="mailQuestion">想问对方什么？</label><input id="mailQuestion" maxlength="100" oninput="mail.sync()" value="'+E(d.question)+'" placeholder="你家也有这样的习惯吗？">')+
       (d.photo?'<figure>'+img(d.photo)+'</figure>'+button('移除照片','mail.removePhoto()'):'<label class="mail-upload">＋ 附一张生活照<input type="file" accept="image/*" onchange="mail.photo(this)"></label>')+
@@ -276,6 +284,15 @@ const mail = (() => {
     oldPaint();const active=page.startsWith('mail'),buttons=$('nav').querySelectorAll('button');
     buttons[1].insertAdjacentHTML('afterend','<button class="post-tab" onclick="mail.home()" '+(active?'aria-current="page"':'')+'><i aria-hidden="true"></i><span>来信</span></button>');
     if(active)$('app').innerHTML=render();
+    if(page==='chat'){
+      const shared=personal().filter(t=>other(t)===peer&&t.messages.length>1).sort((a,b)=>b.updated-a.updated)[0];
+      if(shared){
+        const source=document.createElement('button');source.className='chat-origin';
+        source.textContent='你们聊过《'+shared.title+'》 · 翻看原信';
+        source.onclick=()=>{status='';open(shared.id,'chat')};
+        $('app').querySelector('.thread')?.before(source);
+      }
+    }
     if(page==='identity'){
       const peers=new Set(personal().map(other).filter(k=>k.startsWith('L')));
       for(const k of peers)$('app').querySelector('.pad').insertAdjacentHTML('beforeend',button(av(k)+'<strong>'+toName(k)+'</strong>'+tags(k)+'<small class="end">通信身份 · 切换</small>',"actAs('"+k+"')",'person'));
@@ -403,15 +420,36 @@ main[data-area="personal"] .panel,.postcard-back{background-color:var(--surface)
   for(const item of base.filter(p=>p.id>=200&&p.id<234)){const n=item.id-200;item.v=lines[n];item.c=localCategories[n];item.t=localTitles[n]}
   function photos(x){return localImg[x.id]?.length?uploads(x.id):mkPhotos(pubPhoto(x))}
   function mkPhotos(nums){return nums.length?mkG(nums):''}
+  // Each handbook excerpt uses the same post and reply as its discussion.
+  const localConversations=[
+    [7,2,'d','早上赶课，你在哪儿吃第一口？','周末回家，我爸先把奶茶倒进碗里。我把炒米分两次加，坐下来慢慢吃。','我有早八的时候，在公交站旁买两个包子。一到周六反倒常常睡过早餐。'],
+    [14,1,'a','端午那天，家里的粽子谁来包？','我爸包，我剪棉线。每次他问够不够长，我都得先在粽子上比画一圈。','今年我们谁也没包。我下班从菜场带了四只，回家跟妈妈一人切半只，四种口味都尝到了。'],
+    [17,1,'e','中秋晚上，你家把桌子摆在哪儿？','我家把圆桌挪到客厅中间，给博饼腾地方。最怕骰子滚到底下，一桌人都要弯腰找。','我和姐姐把小折桌搬到阳台。我们分一块柚子，给没回家的表哥打视频，聊到蚊子来才收桌。'],
+    [31,1,'c','火把节那晚，你留到了几点？','我和朋友等到火光暗下来才走。路上我们还在哼刚听到的歌，谁也没唱准。','今年我值晚班。妹妹给我发了一段现场录音，我在休息室听了两遍，第二天才回去陪家里人吃饭。'],
+    [32,1,'b','苗年家里来客人，你忙的是哪一件事？','我守着厨房门，谁进屋就添一副碗筷。坐了一下午，倒比谁都清楚人到齐了没有。','我负责去车站接外婆。她一下车先问锅里炖了什么，我们两个是最后才坐到桌边的。']
+  ];
+  const contrasts=new Map();
+  for(const [province,c,p,t,v,answer] of localConversations){
+    const post={id:600+province,province,c,p,t,v,r:[['L'+province,answer]]};
+    base.push(post);contrasts.set(province,post);
+  }
   let origin=null,formPlace=null,fromForumDetail=null;
   mapMode=true;
   const app=$('app'),main=document.querySelector('main');
-  const compose=document.createElement('button');compose.id='composeFloat';compose.hidden=true;main.append(compose);
+  const compose=document.createElement('button');compose.id='composeFloat';compose.hidden=true;main.querySelector('header').append(compose);
   function filters(){return '<div class="stream-filters">'+cats.map((c,i)=>'<button aria-pressed="'+(i===filter)+'" onclick="editionFilter('+i+')">'+E(c)+'</button>').join('')+'</div>'}
   window.editionFilter=i=>{filter=i;homeLimit=9;paint()};
   window.editionPlace=i=>{fromForumDetail=page==='detail'?cur:null;openPlace(i)};
   window.editionRead=(id,linked=false)=>{origin=linked?{page,placeId,topicId}:null;read(id)};
-  function card(x){const id=placeOf(x);return '<article class="note-card" data-topic="'+Number(x.c)+'">'+author(x.p)+'<button class="topic-open" onclick="editionRead('+x.id+')"><h3>'+E(x.t)+'</h3><p>'+E(x.v)+'</p></button>'+photos(x)+'<div class="note-meta">'+(places[id]?B(E(places[id][0])+' · '+cats[x.c], 'editionPlace('+id+')','place-link'):E(cats[x.c]))+B(cm(x).length?'看 '+cm(x).length+' 条回答':'写下第一个回答','editionRead('+x.id+')','act')+'</div></article>'}
+  window.editionAnswer=id=>{
+    window.editionRead(id);const answer=app.querySelector('.comment:last-of-type')||[...app.querySelectorAll('.comment')].at(-1);
+    if(answer){answer.tabIndex=-1;answer.focus({preventScroll:true});answer.scrollIntoView({block:'center'})}
+  };
+  function card(x){
+    const id=placeOf(x),answers=cm(x),last=answers.at(-1);
+    const quote=last?B('<b>'+E(P[last.s][0])+'</b> '+E(last.t),'editionAnswer('+x.id+')','answer-preview'):'';
+    return '<article class="note-card" data-topic="'+Number(x.c)+'">'+author(x.p)+'<button class="topic-open" onclick="editionRead('+x.id+')"><h3>'+E(x.t)+'</h3><p>'+E(x.v)+'</p></button>'+photos(x)+quote+'<div class="note-meta">'+(places[id]?B(E(places[id][0])+' · '+cats[x.c], 'editionPlace('+id+')','place-link'):E(cats[x.c]))+B(answers.length?'看 '+answers.length+' 条回答':'写下第一个回答','editionRead('+x.id+')','act')+'</div></article>'
+  }
   const features=[
     {region:'呼和浩特',image:13,id:2,stock:'apricot'},
     {region:'哈尔滨',image:0,id:200,stock:'frost'},
@@ -462,10 +500,35 @@ main[data-area="personal"] .panel,.postcard-back{background-color:var(--surface)
   addpost=function(){const id=Number($('postProvince')?.value??-1);const before=S.posts.length;savePost();if(S.posts.length>before){S.posts[0].province=id;sv();paint()}};
   function related(){const key=placeId;const matches=posts().filter(x=>placeOf(x)===key&&(page!=='theme'||x.c===topicId+1)).slice(0,3);
     const host=app.querySelector('.pad');if(!host)return;
+    const exchange=contrasts.get(key);
+    if(page==='place'&&exchange){
+      const section=document.createElement('section');section.className='local-voices';
+      const [k,text]=exchange.r[0];
+      const voice=(who,body)=>'<div><b>'+E(P[who][0])+'</b><p>'+E(body)+'</p></div>';
+      section.innerHTML='<h2>'+E(exchange.t)+'</h2><div class="two-voices">'+voice(exchange.p,exchange.v)+voice(k,text)+'</div>'+B('加入这段讨论','editionRead('+exchange.id+',true)','place-link');
+      host.querySelector('.rhero')?.after(section);
+    }
     if(page==='theme'){host.querySelector('button.solid.full')?.remove()}
     const panel=document.createElement('section');panel.className='related';panel.innerHTML='<h3>'+E(places[key][0])+'的讨论</h3>'+matches.map(x=>B(E(x.t)+'　›','editionRead('+x.id+',true)','topic-open')).join('');const ask=document.createElement('button');ask.textContent='＋ 问问这里的朋友';ask.onclick=()=>begin(true);panel.append(ask);const foot=host.querySelector('.folio');host.insertBefore(panel,foot||null);
   }
   const legacy=paint;
+  function contacts(pad){
+    const heading=pad.querySelector('h3');if(!heading)return;
+    pad.querySelectorAll('.chatrow,.empty').forEach(el=>el.remove());
+    heading.textContent='最近聊过';
+    const list=document.createElement('div'),directory=document.createElement('details');
+    directory.className='contact-book';
+    const all=others().filter(friends);
+    const histories=all.map(k=>({k,last:S.msgs[pair(k)]?.at(-1)})).filter(x=>x.last)
+      .sort((a,b)=>(b.last.ts||0)-(a.last.ts||0));
+    for(const {k,last} of histories){
+      list.insertAdjacentHTML('beforeend',B(av(k)+'<span><strong>'+E(P[k][0])+'</strong><span class="small">'+(last.s===S.me?'我：':'')+E(last.t)+'</span></span><small class="end">'+E(last.at)+'</small>',"openchat('"+k+"')",'chatrow'));
+    }
+    if(!histories.length)list.innerHTML='<p class="small">从通讯录选一位朋友，就能开始第一段私信。</p>';
+    directory.innerHTML='<summary>通讯录 <small>'+all.length+' 人</small></summary>'+all.map(k=>B(av(k)+'<strong>'+E(P[k][0])+'</strong>'+tags(k),"openchat('"+k+"')",'contact-entry')).join('');
+    directory.open=!histories.length;
+    heading.after(list,directory);
+  }
   function styleAtlas(){
     const pad=app.querySelector('.pad');pad.classList.add('atlas-index');
     pad.querySelector('h1').textContent='地方手册';
@@ -512,7 +575,7 @@ main[data-area="personal"] .panel,.postcard-back{background-color:var(--surface)
     if(page==='friends'||page==='circle'){
       const pad=app.querySelector('.pad');const isCircle=page==='circle';
       if(isCircle){pad.querySelector('.back')?.remove();pad.querySelector('.solid')?.remove();pad.querySelector('.small.gap')?.remove()}
-      else{pad.querySelector('.circleEntry')?.remove()}
+      else{pad.querySelector('.circleEntry')?.remove();contacts(pad)}
       const h=pad.querySelector('h1');if(h)h.textContent=isCircle?'朋友圈':'通讯录';
       pad.querySelector('.series')?.remove();
       const sn=document.createElement('div');sn.className='edition-switch';sn.innerHTML='<button onclick="home(1)" '+(!isCircle?'aria-current="page"':'')+'>私信</button><button onclick="circle()" '+(isCircle?'aria-current="page"':'')+'>朋友圈</button>';const anchor=h?.closest('.spread')||h;anchor?.after(sn);
@@ -696,5 +759,24 @@ main[data-area="personal"] .pad>h1{color:#633a55}
 main[data-area="personal"] .pad>.subarea{border:1px solid #dacbd0;border-left:4px solid #bf90a0;border-radius:4px 9px 9px 4px}
 @media(max-width:350px){.region-reel .topic-photo strong{font-size:18px}.region-reel .topic-photo span{bottom:40px}.region-reel .mail-signature{font-size:12px}}
 main[data-page="friends"] .pad>.spread button,main[data-page="circle"] .pad>.spread button{background:#f9efd9;color:#384875;border:1px solid #f4d8a0}
+header #composeFloat{position:static;margin-left:auto;box-shadow:none;border-radius:6px;padding:6px 12px;min-height:34px;font-size:14px}
+main[data-page="home"] .stream{padding-bottom:24px}
+.note-card .answer-preview{grid-column:1/-1;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;text-align:left;margin:5px 0;padding:5px 9px;background:#f4f1e9;color:#49464b;border-left:2px solid #cfc5ad;font-size:14px;line-height:1.55}
+.answer-preview b{color:var(--cat-ink);margin-right:4px}
+.local-voices{margin:14px 0 18px;padding:14px;background:#fffdf6;color:#333943;border:1px solid #cec8b8;border-radius:9px}
+.local-voices h2{font-size:19px;line-height:1.5;margin:0 0 10px}
+.two-voices{display:grid;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.two-voices>div{padding:10px;background:#f5ead6;border-top:3px solid #be895d;border-radius:3px}
+.two-voices>div+div{background:#e6efeb;border-color:#78a49b}
+.two-voices b{font-size:15px}.two-voices p{font-size:15px;line-height:1.65;margin:5px 0 0}
+.local-voices .place-link{margin-top:10px;color:#28564f;font-weight:bold}
+.contact-book{background:#fffcf4;border:1px solid #d7d4c9;border-radius:8px;margin:16px 0;padding:0 12px}
+.contact-book summary{padding:12px 0;color:#374773;cursor:pointer;font-weight:700}.contact-book summary small{font-weight:400}
+.contact-entry{display:flex;align-items:center;gap:7px;flex-wrap:wrap;width:100%;padding:10px 0;border-top:1px solid #e7e4db;text-align:left}
+.chatrow .small,.reply-excerpt{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow-wrap:anywhere}
+.chat-origin{width:100%;text-align:left;background:#eaf0fb;color:#374c7b;padding:10px;border-left:3px solid #8597bb;margin:10px 0;border-radius:4px;font-size:14px}
+.reply-prompt b{display:block;font-size:14px;color:#8a4d36}.mail-address .reply-excerpt{margin:5px 0 14px;line-height:1.65;font-style:normal}
+.postcard-back .origin-stamp{border-width:1px;transform:none}
+@media(max-width:355px){.two-voices{grid-template-columns:1fr}}
 </style>
 </html>

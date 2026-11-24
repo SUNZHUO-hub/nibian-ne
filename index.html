@@ -411,20 +411,20 @@ main[data-area="personal"] .panel,.postcard-back{background-color:var(--surface)
   window.editionFilter=i=>{filter=i;homeLimit=9;paint()};
   window.editionPlace=i=>{fromForumDetail=page==='detail'?cur:null;openPlace(i)};
   window.editionRead=(id,linked=false)=>{origin=linked?{page,placeId,topicId}:null;read(id)};
-  function card(x){const id=placeOf(x);return '<article class="note-card">'+author(x.p)+'<button class="topic-open" onclick="editionRead('+x.id+')"><h3>'+E(x.t)+'</h3><p>'+E(x.v)+'</p></button>'+photos(x)+'<div class="note-meta">'+(places[id]?B(E(places[id][0])+' · '+cats[x.c], 'editionPlace('+id+')','place-link'):E(cats[x.c]))+B(cm(x).length?'看 '+cm(x).length+' 条回答':'写下第一个回答','editionRead('+x.id+')','act')+'</div></article>'}
+  function card(x){const id=placeOf(x);return '<article class="note-card" data-topic="'+Number(x.c)+'">'+author(x.p)+'<button class="topic-open" onclick="editionRead('+x.id+')"><h3>'+E(x.t)+'</h3><p>'+E(x.v)+'</p></button>'+photos(x)+'<div class="note-meta">'+(places[id]?B(E(places[id][0])+' · '+cats[x.c], 'editionPlace('+id+')','place-link'):E(cats[x.c]))+B(cm(x).length?'看 '+cm(x).length+' 条回答':'写下第一个回答','editionRead('+x.id+')','act')+'</div></article>'}
   const features=[
-    {region:'呼和浩特',image:13,id:2},
-    {region:'哈尔滨',image:0,id:200},
-    {region:'泉州',image:31,id:4},
-    {region:'云南',image:56,id:3},
-    {region:'新疆',image:22,id:212}
+    {region:'呼和浩特',image:13,id:2,stock:'apricot'},
+    {region:'哈尔滨',image:0,id:200,stock:'frost'},
+    {region:'泉州',image:31,id:4,stock:'brick'},
+    {region:'云南',image:56,id:3,stock:'iris'},
+    {region:'新疆',image:22,id:212,stock:'wheat'}
   ];
   let reelIndex=0,paused=matchMedia('(prefers-reduced-motion: reduce)').matches,tearDownReel=()=>{};
   function mountReel(root){
-    const slides=features.map(({region,image,id})=>{
+    const slides=features.map(({region,image,id,stock})=>{
       const slide=document.createElement('button');
       const post=base.find(x=>x.id===id);
-      slide.className='topic-photo';slide.innerHTML=jpg(image)+'<b class="postmark">'+E(region)+'</b><span><strong>'+E(post.t).replace('，','，<br>')+'</strong></span><div class="mail-signature">'+E(region)+' · '+E(P[post.p][0])+' 寄</div>';
+      slide.dataset.stock=stock;slide.className='topic-photo';slide.innerHTML=jpg(image)+'<b class="postmark">'+E(region)+'</b><span><strong>'+E(post.t).replace('，','，<br>')+'</strong></span><div class="mail-signature">'+E(region)+' · '+E(P[post.p][0])+' 寄</div>';
       slide.setAttribute('aria-label',region+'，'+base.find(x=>x.id===id).t);
       slide.onclick=()=>editionRead(id);root.append(slide);return slide;
     });
@@ -492,7 +492,7 @@ main[data-area="personal"] .panel,.postcard-back{background-color:var(--surface)
     compose.hidden=!['home','circle'].includes(page);
     compose.textContent=page==='circle'?'＋ 发动态':'＋ 发话题';
     compose.onclick=()=>page==='circle'?route('momentNew',1):begin(false);
-    main.dataset.area=['community','friends','atlas','personal','sea'][tab];
+    main.dataset.page=page;main.dataset.area=['community','friends','atlas','personal','sea'][tab];
     if(page==='discover')styleAtlas();
     if(page==='home')feed();
     if(page==='place'||page==='theme'){related();if(page==='place'&&fromForumDetail!==null){const btn=app.querySelector('.back');btn.textContent='‹　回到讨论';btn.onclick=()=>{const id=fromForumDetail;fromForumDetail=null;read(id)}}}
@@ -626,5 +626,75 @@ main[data-area="personal"] .panel h2{color:#fffaf0}.panel .bigav{border:3px soli
 .mail-compose{border-radius:9px;background:#f3ebe0;border-color:#c5ab93}.mail-sheet blockquote{border-color:var(--seal);background:#f4ede3}
 @media(max-width:335px){.stream{padding-inline:10px}.stream .note-card{column-gap:7px;padding:11px}.region-reel .topic-photo strong{font-size:21px}}
 .origin-stamp{float:right;display:grid;place-items:center;margin:2px 0 10px 12px;width:49px;min-height:42px;transform:rotate(7deg);border:3px double #a16d53;color:#80523b;background:#f5ebd9;font:700 12px/1.3 SimSun,serif}.region-reel .topic-photo span{width:auto;max-width:none}.region-reel .topic-photo strong{max-width:none}.postmark{aspect-ratio:1;min-width:0;width:50px;border-radius:50%;box-sizing:border-box}
+
+/* A set of colour-printed postcards: shared stock and ink, individually coloured editions. */
+:root{
+  --canvas:#f6f1e8;--surface:#fffdf5;--text:#292c40;--forest:#293954;--seal:#ae412d;--edge-soft:#dbd2c1;
+  --airmail:repeating-linear-gradient(120deg,#d45742 0 13px,#fff5da 13px 24px,#364e8c 24px 37px,#fff5da 37px 48px)
+}
+body{background:#d9cfc0}
+main[data-area]{--ink:#334875;--tint:#f4d7ae;--stock:#fff9ed}
+main[data-area="friends"]{--ink:#384e92;--tint:#d6dff5;--stock:#f4f6fd}
+main[data-area="sea"]{--ink:#9a412e;--tint:#f2d1a5;--stock:#fff7e6}
+main[data-area="atlas"]{--ink:#19615c;--tint:#c7e3d3;--stock:#f3f8eb}
+main[data-area="personal"]{--ink:#70405d;--tint:#ebcfda;--stock:#fcf1f1}
+main[data-area]:not([data-land]):not(.seaActive) #app{background-color:#f8f3e9;background-image:radial-gradient(#674e4111 .65px,transparent .85px),linear-gradient(175deg,var(--tint) -24%,var(--stock) 31%,#f8f3e9 65%);background-size:5px 5px,100% 100%}
+main[data-area]:not([data-land]):not(.seaActive) header{background:#fffaf0;color:#283651}
+main:not(.seaActive) header:after{height:3px;opacity:.92}
+main .brand{color:#263653}
+main[data-area]:not([data-land]) #nav .on,main #nav .post-tab[aria-current]{color:var(--ink)}
+nav :is(.on,.post-tab[aria-current]):after{background:var(--ink)}
+main[data-area]:not([data-land]) #nav{background:#fffaf1}
+.stream .region-reel{border:0;border-radius:6px;isolation:isolate;height:clamp(300px,79vw,346px);margin-bottom:23px;box-shadow:1px 3px 0 #fff8df,2px 5px 0 #bfb398,0 11px 19px -15px #46372dd9}
+.region-reel .topic-photo{--card-stock:#f8ba67;--card-ink:#312b46;--stamp-stock:#374e8b;--stamp-ink:#ffebbd;display:block;isolation:isolate;background:var(--card-stock)}
+.region-reel [data-stock="frost"]{--card-stock:#a9cee0;--card-ink:#192e50;--stamp-stock:#69496f;--stamp-ink:#fff0cf}
+.region-reel [data-stock="brick"]{--card-stock:#f19578;--card-ink:#462535;--stamp-stock:#315a56;--stamp-ink:#fff0c7}
+.region-reel [data-stock="iris"]{--card-stock:#c6b4df;--card-ink:#352740;--stamp-stock:#7b352a;--stamp-ink:#fff1c9}
+.region-reel [data-stock="wheat"]{--card-stock:#e4cf74;--card-ink:#303427;--stamp-stock:#345a67;--stamp-ink:#fff0bf}
+.region-reel .topic-photo img{position:absolute;inset:0 0 auto;width:100%;height:calc(100% - 119px);object-fit:cover;object-position:50% 51%}
+.region-reel .topic-photo:after{z-index:0;inset:auto 0 0;height:121px;background:radial-gradient(ellipse at 100% 120%,transparent 46%,#ffffff4a 47% 48%,transparent 49% 58%,#ffffff38 59% 60%,transparent 61% 69%,#ffffff35 70% 71%,transparent 72%) right/40% 100% no-repeat,var(--card-stock);border-top:2px dashed #59463560}
+.region-reel .topic-photo:before{content:'';position:absolute;z-index:1;left:0;right:0;top:0;height:5px;background:repeating-linear-gradient(120deg,var(--stamp-stock) 0 11px,var(--card-stock) 11px 21px,#fff5d8 21px 28px)}
+.region-reel .topic-photo span{inset:auto 12px 41px 16px;text-align:left}
+.region-reel .topic-photo strong{color:var(--card-ink);text-shadow:none;font:800 clamp(19px,5.35vw,25px)/1.27 SimSun,"Songti SC",serif;letter-spacing:0;text-wrap:initial}
+.region-reel .postmark{z-index:1;inset:16px auto auto 13px;width:fit-content;min-width:62px;height:34px;aspect-ratio:auto;border:1px solid #fff3c4;border-radius:0;transform:rotate(-4deg);padding:0 9px;color:var(--stamp-ink);background:var(--stamp-stock);display:flex;align-items:center;justify-content:center;font:700 15px/1 SimSun,"Songti SC",serif;box-shadow:0 0 0 3px var(--stamp-stock),1px 4px 4px #28201066}
+.region-reel .postmark:before,.region-reel .postmark:after{display:none}
+.region-reel .mail-signature{bottom:15px;left:16px;color:var(--card-ink);font-size:13px}
+.region-reel .reel-controls{inset:auto 8px 6px auto;background:#fff8e5;border:1px solid #54475235;border-radius:20px;padding:0 4px;gap:2px;color:#32364d}
+.region-reel .reel-toggle{background:transparent;border:0;border-left:1px solid #54475235;border-radius:0;margin:0;color:#32364d;min-height:24px}
+.region-reel .reel-dots button{width:15px;height:28px}
+.region-reel .reel-dots button:before{background:#a5a18f}
+.region-reel .reel-dots button[aria-current=true]:before{background:#9b462f;width:11px}
+.stream .feed-heading h1{color:#283451}.feed-heading h1:before{background:#d45237;box-shadow:4px 2px 0 #efc56e;width:4px;transform:rotate(7deg);margin-right:4px}
+.stream .stream-filters{border:0;background:transparent;gap:5px;padding:0}
+.stream-filters button,.note-card{--cat-bg:#f4d9cc;--cat-ink:#853728}
+.stream-filters button:nth-child(1){--cat-bg:#dce2f2;--cat-ink:#334572}
+.stream-filters button:nth-child(3),.note-card[data-topic="2"]{--cat-bg:#f7e2a4;--cat-ink:#674b19}
+.stream-filters button:nth-child(4),.note-card[data-topic="3"]{--cat-bg:#d8e7e0;--cat-ink:#25574e}
+.stream-filters button{background:var(--cat-bg);color:var(--cat-ink);border:1px solid color-mix(in srgb,var(--cat-ink) 23%,transparent);border-radius:5px;min-height:37px}
+.stream-filters button[aria-pressed=true]{background:var(--cat-ink);color:white;border-color:var(--cat-ink);box-shadow:inset 0 -3px 0 #ffffff4d}
+.stream .note-card{border:1px solid #d7ccba;border-top:3px solid color-mix(in srgb,var(--cat-bg) 60%,var(--cat-ink));border-radius:4px 10px 10px 4px;background:linear-gradient(115deg,color-mix(in srgb,var(--cat-bg) 27%,#fffdf8),#fffdf8 65%);box-shadow:1px 3px 0 #d6cebd7a}
+.note-card .topic-open h3{color:#303248}.note-card .topic-open p{color:#535057}
+.stream .note-card .place-link{background:var(--cat-bg);color:var(--cat-ink);border-radius:3px}
+.note-meta{border-top:1px dashed #d7cdb8}
+#composeFloat{background:#ac442f;border-color:#fff2d1}
+main[data-page="friends"] .pad>.spread,main[data-page="circle"] .pad>.spread{position:relative;overflow:hidden;background:repeating-linear-gradient(135deg,transparent 0 15px,#ffffff12 15px 17px,transparent 17px 33px) right/34% 100% no-repeat,#3b508b;color:white;border-radius:8px 8px 2px 2px;padding:17px 13px 22px}
+main[data-page="friends"] .pad>.spread h1,main[data-page="circle"] .pad>.spread h1{color:white;margin:0}
+main[data-area="friends"] .edition-switch{margin:0 0 15px;border:1px solid #bac6df;border-top:0;border-radius:0 0 8px 8px;background:#d8e1f4;padding:5px}
+main[data-area="friends"] .edition-switch button{color:#32436b}
+main[data-area="friends"] .edition-switch [aria-current]{background:#35467b;color:white}
+main[data-area="friends"] .chatrow{border-color:#d4d9e4}
+.post-office{padding-top:17px}.post-office h1{color:#713f36}
+.post-office .mail-cover{border:1px solid #d5b993;border-radius:3px;padding:9px;background:linear-gradient(120deg,#fff9e6,#f7e3c1);box-shadow:2px 3px 0 #fff5d6,3px 5px 0 #cda780,0 12px 20px -15px #69412e}
+.mail-photo img{border-radius:2px}.inkmark{color:#9b3c32;background:#ffdeb0;border-color:#a64c39}
+.mail-address strong{color:#562f35}.post-office .mail-address>span,.post-office .mail-primary{color:#fff9eb;background:#994631;border-color:#994631}
+.post-office .mail-compose{border:1px dashed #b9815b;background:#f1d7ad}.mail-pencil{background:#f9ead3;border-radius:50%;width:38px;text-align:center}
+.atlas-index>h1{background:repeating-radial-gradient(ellipse at 110% 0%,transparent 0 13px,#9ed7cc44 14px 15px,transparent 16px 26px),linear-gradient(110deg,#24595b,#236d68 63%,#50918a);color:#fff6d3}
+.atlas-index .toggle .chosen{background:#225f5c}.atlas-index .region-keys button{background:color-mix(in srgb,var(--key) 33%,#fffcf1);border-color:color-mix(in srgb,var(--key) 70%,#ddd)}
+.atlas-index .mapbox{border-color:#fff9e6;background-color:#edf0d9}
+main[data-area="personal"] .panel{background:repeating-radial-gradient(ellipse at 110% 24%,transparent 0 13px,#f1c4a743 14px 16px,transparent 17px 26px),linear-gradient(115deg,#65415e,#86455c 67%,#a75960);border-left:7px solid #d49671;color:#fff6e6}
+main[data-area="personal"] .pad>h1{color:#633a55}
+main[data-area="personal"] .pad>.subarea{border:1px solid #dacbd0;border-left:4px solid #bf90a0;border-radius:4px 9px 9px 4px}
+@media(max-width:350px){.region-reel .topic-photo strong{font-size:18px}.region-reel .topic-photo span{bottom:40px}.region-reel .mail-signature{font-size:12px}}
+main[data-page="friends"] .pad>.spread button,main[data-page="circle"] .pad>.spread button{background:#f9efd9;color:#384875;border:1px solid #f4d8a0}
 </style>
 </html>

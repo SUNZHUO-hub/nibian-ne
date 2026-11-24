@@ -118,31 +118,150 @@ function redrawFaces(){const wrap=page==='profile'||page==='mine'?$('app').query
 const picPaint=paint;paint=function(){picPaint();redrawFaces();if(page==='place'){$('app').querySelector('.rhero').insertAdjacentHTML('beforeend','<small class="piclabel">'+E(names[locPhoto(placeId)])+'</small>')}if(page==='detail'&&pubPhoto(post()).length){let gallery=$('app').querySelector('.snapgrid');if(gallery)gallery.insertAdjacentHTML('afterend','<span class="aiLabel">地方生活配图</span>')}};paint();
 const landLabels=[["东北", "初雪蓝", "六角雪晶"], ["华北", "陶杏色", "灰瓦屋檐"], ["西北", "暖沙黄", "风积沙丘"], ["华东", "水巷青", "石桥涟漪"], ["华中", "藕荷粉", "荷叶莲瓣"], ["华南", "青柚绿", "蕉叶脉络"], ["西南", "雾山紫", "山地梯田"]],drawLandBase=paint;paint=function(){const m=document.querySelector('main'),on=['region','place','theme'].includes(page),n=page==='region'?region:groupOf(placeId);if(on)m.dataset.land=n;else delete m.dataset.land;drawLandBase();if(on){let [r,c,motif]=landLabels[n];$('app').querySelector('.pad').insertAdjacentHTML('beforeend','<div class="folio"><span>'+r+'　/　'+c+' · '+motif+'</span><b>ATLAS　0'+(n+1)+'</b></div>')}};paint();const bottleSeeds=lines.map((t,i)=>({id:'sea'+i,s:'L'+i,place:places[i][0],body:t+'\n\n'+places[i][1+(i%3)*2]+'如果有机会，也想听听你那边的故事。'}));
 S.sea??={sent:[],seen:{},saved:{},draft:{}};let floating=null,letter=null,seaNote='',uncorking=false,tideTimer,glassSerial=0,fromChest=false;
-function glass(w=''){let id='glass'+(++glassSerial);return '<svg class="glass '+w+'" viewBox="0 0 100 146" aria-hidden="true"><defs><linearGradient id="'+id+'" x1="0" x2="1" y2="1"><stop stop-color="#71fbe9"/><stop offset=".30" stop-color="#68c9ff"/><stop offset=".59" stop-color="#9c8ef3"/><stop offset=".82" stop-color="#e497db"/><stop offset="1" stop-color="#ffbd91"/></linearGradient></defs><g transform="rotate(13 50 75)"><g class="stopper"><path d="M38 9q10-4 23 0l-2 15H41z" fill="#af7753" stroke="#633e36" stroke-width="2"/><path d="m42 10 14 1m-10 5 4 1" stroke="#e0b28b" stroke-width="2"/></g><path d="M38 23h23v8l-3 2v17c0 8 23 12 23 30v41q0 13-13 14H32q-13-1-13-14V80c0-18 23-22 23-30V33l-4-2Z" fill="url(#'+id+')" stroke="#565780" stroke-width="2.3"/><path d="M24 94q15-7 27 0t25-2v27q0 11-10 12H35q-11-1-11-10z" fill="#8881d2" opacity=".5"/><g transform="rotate(-24 50 97)" class="roll"><path d="M40 75h18v43H40z" fill="#b89463" stroke="#805e3f"/><ellipse cx="49" cy="75" rx="9" ry="3" fill="#d7bd8d"/><path d="M40 94h18v5H40z" fill="#ab5364"/></g><path d="M46 37v14c0 9-18 14-20 28v21m0 6v5" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" opacity=".82"/><path d="M38 27h23" stroke="#d1f7ff" stroke-width="4"/></g></svg>'}
 const stockLetters=[['b','黔东南','我家过苗年时，我总爱搬一张矮凳坐在厨房门边。不是等第一口饭，是想看看今年谁先推开门。我给你留一个位置，你那边的节日从哪一刻开始？'],['d','呼和浩特','朋友以为奶茶总是甜的。我给他倒了家里常喝的那一种，又把炒米放在桌上让他自己添。比解释“正不正宗”有意思多了。你家有什么得尝一口才说得清的味道？'],['e','泉州','我小时候记住中秋，是因为骰子碰到碗的声音。这两天想起的反倒是大家弯腰找骰子的样子。你最熟悉的节日，听起来是什么声音？'],['c','昆明','我把火把节那天的照片翻了一遍，最喜欢的却是散场后朋友并肩走路的背影。想把那段路寄给你。你有没有一张，别人看不懂你却舍不得删的照片？'],['a','南京','我以前和朋友约见面，习惯只说“老地方”。直到新同学问我是哪一棵梧桐树，我才发觉，有人记得一条街，有人记得那条街上的一个人。你的老地方叫什么？']].map(([s,place,body],i)=>({id:'story'+i,s,place,body}));
-const allLetters=()=>[...S.sea.sent,...stockLetters,...bottleSeeds],known=()=>(S.sea.seen[S.me]||[]),personalLetters=()=>S.sea.sent.filter(l=>l.to===S.me&&l.s!==S.me),allIncoming=()=>[...personalLetters(),...stockLetters,...bottleSeeds].filter(l=>l.s!==S.me);
-function rand(a){let r=new Uint32Array(1);crypto.getRandomValues(r);return a[Math.floor(r[0]/4294967296*a.length)]}
-function selectFloating(){let incoming=allIncoming().filter(l=>!known().includes(l.id)),priority=incoming.filter(l=>l.to===S.me);floating=(priority.length||incoming.length)?rand(priority.length?priority:incoming):null}
-function seaHome(){clearTimeout(tideTimer);uncorking=false;letter=null;fromChest=false;seaNote='';selectFloating();route('sea',4)}
-function seaOpen(){if(uncorking||!floating)return;uncorking=true;document.querySelector('.afloat')?.classList.add('popped');let item=floating;tideTimer=setTimeout(()=>{uncorking=false;if(page!=='sea'||item!==floating)return;letter=item;let seen=S.sea.seen[S.me]??=[];if(!seen.includes(item.id))seen.push(item.id);sv();route('seaLetter',4)},matchMedia('(prefers-reduced-motion: reduce)').matches?30:850)}
-function composeSea(){seaNote='';route('seaWrite',4)}
-function toss(){let txt=$('seaText').value.trim();if(!txt){$('seaErr').textContent='先写一点你想寄出去的地方故事。';$('seaText').focus();return}if(txt.length>600)return;let target=rand(Object.keys(P).filter(k=>k!==S.me&&myTags(k).area!==myTags(S.me).area));let item={id:'user'+Date.now()+'-'+Math.random().toString(36).slice(2,7),s:S.me,to:target,place:myTags(S.me).area||'未署地区',dest:myTags(target).area||'远方',body:txt};S.sea.sent.unshift(item);S.sea.draft[S.me]='';sv();seaNote=item.dest;selectFloating();route('seaSent',4)}
-function keepDraft(){S.sea.draft[S.me]=$('seaText').value;sv()}function book(){clearTimeout(tideTimer);uncorking=false;route('seaBook',4)}
-function replayLetter(id){let l=allLetters().find(x=>x.id===id);if(!l||!(known().includes(id)||l.s===S.me))return;fromChest=true;letter=l;route('seaLetter',4)}
-function getMore(){seaNote='';selectFloating();route('sea',4)}
-function storeSea(){if(!letter)return;let a=S.sea.saved[S.me]??=[];if(a.includes(letter.id))S.sea.saved[S.me]=a.filter(x=>x!==letter.id);else a.push(letter.id);sv();paint()}
-const labelPlace=k=>myTags(k).area||'远方',oceanButton=(s,fn,cl='oBtn')=>B(s,fn,cl);
-function authorSea(){if(letter&&letter.s!==S.me)profile(letter.s)}
-function seaRender(){let h='',me=S.me;const subnav='<div class="seaTools">'+oceanButton('‹　回到海面','seaHome()','seaBack')+oceanButton('信匣','book()','seaBack')+'</div>';
-if(page==='sea'){let total=allIncoming().filter(l=>!known().includes(l.id)).length;h='<div class="seaHero"><div class="seaTop"><span class="seaMono">OCEAN POST　/　海上邮局</span>'+oceanButton('我的信匣','book()','seaBack')+'</div><h1>远方来潮</h1><p>让一句家乡话，遇见另一片岸。</p></div><div class="seaMiddle">'+(floating?'<button class="afloat" aria-label="打开漂来的瓶子" onclick="seaOpen()">'+glass()+'<span class="waveRing"></span></button><span class="pickHint">轻触瓶身 · 拔塞读信</span>':'<div class="pickHint">这次潮汐的来信都读过了，去信匣重读吧。</div>')+'</div><div class="oceanDock"><span class="seaMono">本次潮汐　/　'+total+' 封未读来信</span>'+oceanButton('＋　写信，投一只瓶子','composeSea()')+oceanButton('换一只漂来的瓶子','getMore()','clearSea')+'</div>'}
-if(page==='seaWrite'){h=subnav+'<div class="seaHero compact"><div class="seaMono">OUTGOING　/　离岸邮笺</div><h1>寄给未知的岸</h1></div><section class="writeCard"><label for="seaText">来自 '+E(labelPlace(me))+' 的 '+E(P[me][0])+'</label><p>介绍一件只有听你讲，远方朋友才会懂的小事。</p><textarea maxlength="600" id="seaText" oninput="keepDraft()" placeholder="远方的朋友，你好。我们家……">'+E(S.sea.draft[me]||'')+'</textarea><span id="seaErr" role="status"></span>'+oceanButton('封好纸条，投向大海　↗','toss()')+'<small>投递后随机漂向异地体验身份。草稿自动留在本机。</small></section>'}
-if(page==='seaSent'){h='<div class="sentDay">'+glass('thrown')+'<span class="seaMono">MESSAGE AFLOAT</span><h1>瓶子出发了</h1><p>这一次，洋流将它送往<br><b>'+E(seaNote)+'</b> 的一位朋友。</p>'+oceanButton('看看海面上的来信','seaHome()')+oceanButton('查看寄出记录','book()','clearSea')+'</div>'}
-if(page==='seaLetter'&&letter){let own=letter.s===me;h=subnav+'<section class="oldLetter"><div class="paperInk"><div class="paperHead"><span>海上来信</span><span>OCEAN MAIL</span></div><button class="penFriend" onclick="authorSea()" '+(own?'disabled':'')+'>'+av(letter.s)+'<span><b>'+E(P[letter.s][0])+'</b><small>'+E(letter.place)+'　/　'+(own?'我的署名':'点头像认识写信人　↗')+'</small></span></button><h2>远方的朋友，你好：</h2><p class="inkBody">'+E(letter.body)+'</p><div class="signed">来自 '+E(letter.place)+' 的朋友<br>'+E(P[letter.s][0])+'</div></div></section><div class="letterBtns">'+(!own?oceanButton((S.sea.saved[me]||[]).includes(letter.id)?'✓ 已收藏 · 取消':'收藏这封信','storeSea()'):'')+oceanButton(fromChest?'回到信匣':'回到海面',fromChest?'book()':'seaHome()','clearSea')+'</div>'}
-if(page==='seaBook'){let seen=known().slice().reverse().map(id=>allLetters().find(l=>l.id===id)).filter(Boolean),sent=S.sea.sent.filter(l=>l.s===me);let rows=(a,out)=>a.map(l=>'<button class="mailRow" onclick="replayLetter(\''+l.id+'\')"><b>'+E(out?'寄往 '+l.dest:P[l.s][0]+' · '+l.place)+'</b><small>'+((S.sea.saved[me]||[]).includes(l.id)?'★ ':'')+E(l.body.slice(0,30))+'</small></button>').join('');h=subnav+'<section class="bookCard"><div class="seaMono">PERSONAL POSTBOX</div><h1>我的信匣</h1><h3>收到的　'+seen.length+'</h3>'+(rows(seen,false)||'<p>海面上点开瓶子，来信就会留在这里。</p>')+'<h3>寄出的　'+sent.length+'</h3>'+(rows(sent,true)||'<p>还没有寄出的信。</p>')+'</section>'}
-return '<div class="seaStage st-'+page+'">'+h+'</div>'}
-const beforeSea=paint;paint=function(){beforeSea();let active=page.startsWith('sea');document.querySelector('main').classList.toggle('seaActive',active);let nv=$('nav'),nodes=nv.querySelectorAll('button');nodes[1].insertAdjacentHTML('afterend','<button class="bottleNav '+(active?'selected':'')+'" onclick="seaHome()" aria-label="漂流瓶，进入海上邮局">'+glass()+'<span>漂流瓶</span></button>');if(active){$('app').innerHTML=seaRender();document.querySelector('header>.series').textContent='海上邮局'}else if(document.querySelector('header>.series'))document.querySelector('header>.series').textContent='地方生活志';
-if(page==='identity'){let allowed=new Set([...known().map(id=>allLetters().find(l=>l.id===id)?.s),...S.sea.sent.filter(l=>l.s===S.me).map(l=>l.to)]);allowed.forEach(k=>{if(k&&k.startsWith('L'))$('app').querySelector('.pad').insertAdjacentHTML('beforeend',B(av(k)+'<strong>'+E(P[k][0])+'</strong>'+tags(k)+'<small class="end">海上往来 · 切换</small>',"actAs('"+k+"')",'person'))})}
-};paint();
+const mail = (() => {
+  const stories = [
+    ['e',31,'过节','中秋夜，最响的是那只瓷碗','吃完饭，外婆把大瓷碗往桌上一放，我们就知道该博饼了。六颗骰子叮叮当当，表弟一激动，把一颗扔到了桌子底下。今年轮到我钻下去捡。','你家过中秋，除了分月饼，还会一起做什么？'],
+    ['d',13,'吃饭','我爸泡炒米，总要留一半','我把炒米一股脑倒进热奶茶，我爸偏要分两次放。他说前一把是泡软了吃，后一把还能嚼出响声。','你家饭桌上，有没有一样东西，大家吃法各不相同？'],
+    ['b',57,'过节','苗年那天，我终于坐到了门边','小时候过苗年，我总抢门边的小凳子，今年才发现这个位子最忙。表姐一进门，我就得起身去厨房多拿一双筷子。','你家过节，谁会留心给晚到的人添副碗筷？'],
+    ['c',56,'日常','火把熄了，我们还没走到家','回家那段路，朋友一直哼刚才听见的调子。第二天翻照片，拍下来的火光有十几张，我偏偏想再听一遍那段走调的歌。','你走在家附近，光听什么声音就知道快到家了？'],
+    ['a',34,'吃饭','我们家的粽子靠线认口味','爸包粽子用两种颜色的线。红的是甜的还是咸的，他每年都要重新宣布一遍。我倒是觉得，拆错的那个最好吃。','你家做哪样吃的，会留一个只有家里人才懂的记号？']
+  ];
+  const topics = ['过节','吃饭','日常'];
+  const prompts = ['过节时，你家有哪件小事年年都做？','挑一道家里常吃的菜，讲讲你家的吃法。','从家门口走到街角，你最熟悉哪一幕？'];
+  const db = S.postcardMail ??= {threads:[],drafts:{},opened:{}};
+  const area = k => myTags(k)?.area || '';
+  const province = k => (/^L\d+$/.test(k) ? +k.slice(1) : {a:14,b:32,c:31,d:7,e:17}[k]);
+  const elsewhere = k => k!==S.me && province(k)!==province(S.me) && (!area(k)||area(k)!==area(S.me));
+  const personal = () => db.threads.filter(t=>t.members.includes(S.me));
+  const other = t => t.members.find(k=>k!==S.me);
+  const uid = () => crypto.randomUUID();
+  const message = (s,body,photo=null,question='') => ({s,place:area(s),body,photo,question});
+  const make = (s,to,topic,title,msg,id=uid()) => ({id,members:[s,to],topic,title,messages:[msg],read:{},updated:Date.now()});
+  // Bring previously opened, saved and sent letters into the new correspondence book.
+  if (!db.imported) {
+    const originals = [...stockLetters,...bottleSeeds];
+    for(const item of S.sea.sent||[]) if(P[item.s]&&P[item.to])
+      db.threads.push(make(item.s,item.to,'日常',item.body.slice(0,20),{...message(item.s,item.body),place:item.place},'old-'+item.id));
+    for(const k of Object.keys(P)) {
+      const saved = S.sea.saved[k]||[];
+      for(const id of new Set([...(S.sea.seen[k]||[]),...saved])){
+        const item=originals.find(l=>l.id===id);
+        if(!item||item.s===k)continue;
+        const t=make(item.s,k,'日常',item.body.slice(0,20),{...message(item.s,item.body),place:item.place},'old-'+k+'-'+id);
+        t.read[k]=1;t.saved=saved.includes(id);db.threads.push(t);
+      }
+      if(S.sea.draft[k])db.drafts[k+'-new']={body:S.sea.draft[k],topic:'日常'};
+    }
+    db.imported=true;sv();
+  }
+  let currentId='',reply=false,backPage='mailHome',busy=false,status='';
+  const current = () => personal().find(t=>t.id===currentId);
+  const draftKey = () => S.me+'-'+(reply?currentId:'new');
+  const draft = () => db.drafts[draftKey()] ??= {topic:'过节',body:'',question:'',photo:null};
+  const button=(label,fn,cls='mail-link')=>B(label,fn,cls);
+  const img=p=>Number.isInteger(p)?jpg(p):typeof p==='string'&&/^data:image\/jpeg;base64,/.test(p)?'<img src="'+E(p)+'" alt="随信寄来的生活照片">':'';
+  const stamp=place=>'<span class="inkmark">'+E(place||'远方')+'<i>邮　戳</i></span>';
+  const toName=k=>E(P[k][0]);
+  function candidates(){return stories.filter(([k])=>elsewhere(k)&&!(db.opened[S.me]||[]).includes(k))}
+  function incoming(){return personal().filter(t=>t.messages.at(-1).s!==S.me && (t.read[S.me]||0)<t.messages.length).sort((a,b)=>b.updated-a.updated)}
+  function first(){
+    const t=incoming()[0];if(t){const m=t.messages.at(-1);return {t,place:m.place,s:m.s,photo:m.photo??locPhoto(province(m.s)),title:t.title,topic:t.topic}}
+    const row=candidates()[0];return row&&{row,place:area(row[0]),s:row[0],photo:row[1],title:row[3],topic:row[2]};
+  }
+  function home(){status='';route('mailHome',4)}
+  function open(id,from='mailBook'){
+    currentId=id;const t=current();if(!t)return home();
+    t.read[S.me]=t.messages.length;sv();backPage=from;route('mailThread',4);
+  }
+  function unwrap(){
+    const item=first();if(!item)return home();
+    if(item.t)return open(item.t.id,'mailHome');
+    const [s,p,topic,title,body,q]=item.row,t=make(s,S.me,topic,title,message(s,body,p,q));
+    (db.opened[S.me]??=[]).push(s);db.threads.push(t);open(t.id,'mailHome');
+  }
+  function write(isReply){
+    if(isReply&&!current())return home();
+    reply=isReply;status='';route('mailWrite',4);
+  }
+  function sync(){const d=draft();d.body=$('mailText').value;d.question=$('mailQuestion')?.value||'';sv()}
+  function topic(i){sync();draft().topic=topics[i];sv();paint();$('mailText').focus()}
+  async function photo(input){
+    if(!input.files[0])return;
+    const key=draftKey(),d=draft();busy=true;const err=$('mailErr');err.textContent='正在整理照片…';$('mailSend').disabled=true;
+    try{
+      const bitmap=await createImageBitmap(input.files[0]);
+      const ratio=Math.min(1,720/Math.max(bitmap.width,bitmap.height)),c=document.createElement('canvas');
+      c.width=Math.max(1,Math.round(bitmap.width*ratio));c.height=Math.max(1,Math.round(bitmap.height*ratio));
+      c.getContext('2d').drawImage(bitmap,0,0,c.width,c.height);bitmap.close();
+      d.photo=c.toDataURL('image/jpeg',0.7);sv();status='';
+    }catch{status='这张照片未能读取，请试试 JPG 或 PNG。'}
+    finally{busy=false;if(page==='mailWrite'&&key===draftKey())paint()}
+  }
+  function removePhoto(){draft().photo=null;sv();paint()}
+  function send(){
+    if(busy||page!=='mailWrite')return;
+    sync();const key=draftKey(),d=draft(),body=d.body.trim(),question=d.question.trim();
+    if(!body||(!reply&&!question)){const input=!body?$('mailText'):$('mailQuestion');$('mailErr').textContent=!body?'先写下你想分享的那件事。':'留一个问题，让对方知道可以从哪里回信。';input.focus();return}
+    let t,recipient;const m=message(S.me,body,d.photo,question);
+    const before=JSON.stringify(db);
+    if(reply){t=current();if(!t)return home();t.messages.push(m)}
+    else{
+      const pool=Object.keys(P).filter(elsewhere);if(!pool.length){$('mailErr').textContent='暂时没有可以投递的异地身份。';return}
+      recipient=pool[Math.floor(Math.random()*pool.length)];
+      t=make(S.me,recipient,d.topic,question,m);db.threads.push(t);
+    }
+    t.updated=Date.now();t.read[S.me]=t.messages.length;delete db.drafts[key];
+    try{localStorage.setItem('there.forum.v1',JSON.stringify(S))}
+    catch{Object.assign(db,JSON.parse(before));$('mailErr').textContent='本机存储空间不足，可以移除照片再寄。';return}
+    status=reply?'回信已放入往来记录':'明信片已放入寄出记录';open(t.id,'mailBook');
+  }
+  const navBack=(label,fn)=>'<div class="mail-toolbar">'+button('‹　'+label,fn)+'</div>';
+  function front(){
+    const item=first();
+    return '<div class="mail-heading"><h1>远方来信</h1>'+button('往来信册','mail.book()')+'</div>'+
+      (item?'<button class="mail-cover" onclick="mail.unwrap()" aria-label="拆开来自'+E(item.place||'远方')+'的明信片"><span class="mail-photo">'+img(item.photo)+stamp(item.place)+'</span><span class="mail-address"><small>'+E(item.topic)+' · '+toName(item.s)+' 寄</small><strong>'+E(item.title)+'</strong><span>拆开来信</span></span></button>':'<section class="mail-sheet"><h2>今天的来信都拆过了</h2><p>去信册继续上次的话题，也可以寄出一张新明信片。</p></section>')+
+      '<button class="mail-compose" onclick="mail.write(false)"><span class="mail-pencil" aria-hidden="true">✎</span><span><b>寄一张明信片</b><small>把家乡的一件小事，寄给异地的朋友</small></span></button>';
+  }
+  function book(){status='';route('mailBook',4)}
+  function archive(){
+    const list=personal().sort((a,b)=>b.updated-a.updated);
+    return navBack('来信','mail.home()')+'<h1>往来信册</h1>'+(list.length?list.map(t=>{
+      const m=t.messages.at(-1),k=other(t),unread=m.s!==S.me&&(t.read[S.me]||0)<t.messages.length;
+      return button('<b>'+toName(k)+' · '+E(area(k)||'远方')+'</b><span>'+E(t.title)+'</span><small>'+(unread?'未读来信':m.s===S.me?'已寄出':'已拆阅')+' · '+t.messages.length+' 张'+(t.saved?' · 已收藏':'')+'</small>',"mail.open('"+t.id+"')",'mail-row');
+    }).join(''):'<p class="mail-empty">这里会收好你拆过的信，也会留下每一次回信。</p>'+button('去拆第一封信','mail.home()','mail-primary'));
+  }
+  function thread(){
+    const t=current();if(!t)return front();const k=other(t),sent=t.messages.some(m=>m.s===S.me);
+    return navBack(backPage==='mailBook'?'往来信册':'来信',backPage==='mailBook'?'mail.book()':'mail.home()')+(status?'<p class="mail-status" role="status">'+E(status)+'</p>':'')+
+      '<h1>'+E(t.title)+'</h1>'+t.messages.map((m,i)=>'<article class="mail-sheet"><div class="mail-sender">'+av(m.s)+'<div><b>'+toName(m.s)+'</b><small>'+E(m.place||'未署地区')+' · '+(i?'回信':E(t.topic))+'</small></div></div>'+(m.photo!=null?'<figure>'+img(m.photo)+'</figure>':'')+'<p>'+E(m.body)+'</p>'+(m.question?'<blockquote>'+E(m.question)+'</blockquote>':'')+'</article>').join('')+
+      (t.messages.at(-1).s!==S.me?button('回一张明信片','mail.write(true)','mail-primary'):'<p class="mail-empty">已寄给'+toName(k)+'，等对方回信。</p>')+
+      (sent&&t.messages.length>1?button(friends(k)?'去好友私信':'认识'+toName(k),friends(k)?"openchat('"+k+"')":"profile('"+k+"')",'mail-secondary'):'');
+  }
+  function form(){
+    const d=draft(),t=reply?current():null,last=t?.messages.at(-1);
+    return navBack(reply?'原信':'来信',reply?'mail.cancel()':'mail.home()')+'<h1>'+(reply?'给'+toName(other(t))+'回信':'寄一张明信片')+'</h1><section class="mail-sheet">'+
+      (reply?'<blockquote>'+E(last.question||last.body)+'</blockquote>':'<fieldset><legend>这张聊什么？</legend>'+topics.map((v,i)=>'<button aria-pressed="'+(d.topic===v)+'" onclick="mail.topic('+i+')">'+v+'</button>').join('')+'</fieldset>')+
+      '<label for="mailText">'+(reply?'你那边呢？':'写一件家乡的小事')+'</label><textarea id="mailText" oninput="mail.sync()" maxlength="700" placeholder="'+(reply?'我家是这样过的……':prompts[topics.indexOf(d.topic)])+'">'+E(d.body)+'</textarea>'+
+      (reply?'':'<label for="mailQuestion">想问对方什么？</label><input id="mailQuestion" maxlength="100" oninput="mail.sync()" value="'+E(d.question)+'" placeholder="你家也有这样的习惯吗？">')+
+      (d.photo?'<figure>'+img(d.photo)+'</figure>'+button('移除照片','mail.removePhoto()'):'<label class="mail-upload">＋ 附一张生活照<input type="file" accept="image/*" onchange="mail.photo(this)"></label>')+
+      '<p id="mailErr" role="status">'+E(status)+'</p><button id="mailSend" class="mail-primary" onclick="mail.send()">'+(reply?'寄出回信':'寄给异地朋友')+'</button></section>';
+  }
+  const render=()=>'<div class="post-office">'+({mailHome:front,mailBook:archive,mailThread:thread,mailWrite:form}[page]())+'<footer>体验邮局 · 来信与回信保存在本机</footer></div>';
+  const oldPaint=paint;
+  paint=function(){
+    oldPaint();const active=page.startsWith('mail'),buttons=$('nav').querySelectorAll('button');
+    buttons[1].insertAdjacentHTML('afterend','<button class="post-tab" onclick="mail.home()" '+(active?'aria-current="page"':'')+'><i aria-hidden="true"></i><span>来信</span></button>');
+    if(active)$('app').innerHTML=render();
+    if(page==='identity'){
+      const peers=new Set(personal().map(other).filter(k=>k.startsWith('L')));
+      for(const k of peers)$('app').querySelector('.pad').insertAdjacentHTML('beforeend',button(av(k)+'<strong>'+toName(k)+'</strong>'+tags(k)+'<small class="end">通信身份 · 切换</small>',"actAs('"+k+"')",'person'));
+    }
+  };
+  return {home,unwrap,open,book,write,sync,topic,photo,removePhoto,send,cancel(){status='';route('mailThread',4)}};
+})();
+paint();
+
 </script>
 <style>
 #app{min-height:0;overflow-x:hidden;overscroll-behavior-y:contain}
@@ -377,15 +496,38 @@ main[data-area="personal"] .panel,.postcard-back{background-color:var(--surface)
       if(isCircle)pad.style.paddingBottom='80px';
     }
     if(page==='mine'){app.querySelector('h1').textContent='我的邮册';const note=app.querySelector('.notice');if(note)note.textContent='此版本用于体验。帖子、好友和私信保存在当前浏览器。'}
-    if(page==='seaLetter'&&letter&&letter.s!==S.me){
-      const action=document.createElement('button');action.className='oBtn';action.textContent=friends(letter.s)?'给寄信人写私信':'认识寄信人';
-      action.onclick=()=>friends(letter.s)?openchat(letter.s):authorSea();app.querySelector('.letterBtns').prepend(action);
-    }
     stripTitleExtras();
   };
-  const oldHome=home;home=function(i){origin=null;fromForumDetail=null;formPlace=null;oldHome(i)};
+  const oldHome=home;home=function(i){origin=null;fromForumDetail=null;formPlace=null;if(i===4)mail.home();else oldHome(i)};
   paint();
+  if(new URLSearchParams(location.search).get('view')==='mail')mail.home();
 })();
 </script>
-
+<style>nav .post-tab{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--forest);font-weight:700}
+.post-tab i{display:block;position:relative;width:30px;height:20px;border:1px solid #864a3e;border-radius:2px;transform:rotate(-8deg);background:linear-gradient(148deg,transparent 48%,#a67966 50%,transparent 54%) top right/51% 85% no-repeat,linear-gradient(32deg,transparent 48%,#a67966 50%,transparent 54%) top left/51% 85% no-repeat,#ffefd1;box-shadow:1px 2px #c2aa99}
+.post-tab i:after{content:'';position:absolute;width:6px;height:6px;border-radius:50%;background:#a04435;top:8px;left:11px}
+.post-tab[aria-current] span{color:#944438;border-bottom:2px solid}
+.post-office{max-width:660px;margin:auto;padding:19px 18px 28px;color:#243f4d}
+.post-office *{box-sizing:border-box}.post-office h1,.post-office h2,.mail-address strong{font-family:SimSun,"Songti SC","Noto Serif CJK SC",serif;letter-spacing:.02em}
+.post-office h1{font-size:clamp(26px,6.5vw,34px);line-height:1.35;margin:4px 0 20px;color:#253f4c}
+.mail-heading,.mail-toolbar,.mail-sender{display:flex;align-items:center;gap:10px}.mail-heading{justify-content:space-between;margin-bottom:13px}.mail-heading h1{margin:0}
+.post-office button,.mail-upload{cursor:pointer}.mail-link{border:0;background:transparent;color:#345567;text-decoration:underline;text-underline-offset:4px;min-height:44px}
+.mail-cover,.mail-sheet,.mail-row,.mail-compose{width:100%;border:1px solid #c4b9a6;color:inherit;background:#fffaf0;border-radius:3px;text-align:left}
+.mail-cover{padding:10px;box-shadow:3px 4px 0 #d5cbb9;display:block}
+.mail-photo{position:relative;display:block}.mail-photo img,.mail-sheet figure img{display:block;width:100%;aspect-ratio:1.55;object-fit:cover}
+.inkmark{position:absolute;right:7px;bottom:-16px;min-width:55px;height:55px;padding:0 4px;border:3px double #96513c;background:#fbefda;display:grid;place-content:center;text-align:center;border-radius:50%;color:#823f30;transform:rotate(10deg);font:700 14px/1.15 SimSun,serif}.inkmark i{font:10px/1.5 sans-serif;display:block}
+.mail-address{display:block;padding:15px 9px 5px}.mail-address small,.mail-sender small,.mail-compose small,.mail-row small{display:block;color:#635e53;font-size:14px}.mail-address strong{display:block;font-size:24px;line-height:1.35;margin:9px 0 16px}
+.mail-address>span{display:block;background:var(--forest);color:#fffaf0;padding:12px;text-align:center;border-radius:3px;font-weight:700;font-size:16px}
+.mail-compose{display:flex;align-items:center;gap:13px;padding:14px;margin:18px 0 0;background:#faf2df;border:1px dashed #b1a38b}.mail-compose b,.mail-sender b{font-size:17px}.mail-compose small,.mail-sender small{margin-top:3px}.mail-pencil{font-size:28px;color:#944438}
+.mail-sheet{margin:14px 0;padding:16px;box-shadow:1px 3px #d9cfbd}.mail-sheet figure{margin:13px 0}.mail-sheet p,.mail-sheet blockquote{font-size:16px;line-height:1.85;white-space:pre-wrap;overflow-wrap:anywhere}
+.mail-sheet p{margin:14px 0}.mail-sheet blockquote{margin:15px 0 4px;padding:6px 12px;border-left:3px solid #ac5e48;background:#f4ecdd;color:#513c32}
+.mail-sender .av{border-radius:50%}.mail-primary,.mail-secondary{display:block;width:100%;border-radius:4px;padding:13px 10px;font-size:16px;font-weight:bold}.mail-primary{background:#294e61;color:white;border:1px solid #294e61}.mail-secondary{color:#355767;background:transparent;border:1px solid #a9adb0;margin-top:9px}
+.mail-row{display:grid;gap:6px;padding:14px 15px;margin:7px 0;border-left:4px solid #b07660}.mail-row span{font-size:16px}.mail-row b{font-size:15px}.mail-toolbar{margin:-9px 0 2px}
+.mail-empty,.mail-status{padding:12px 14px;background:#f8f2e6;font-size:15px;line-height:1.6}.mail-status{border-left:3px solid #65806a}
+.mail-sheet fieldset{padding:0 0 12px;border:0;margin:0}.mail-sheet legend,.mail-sheet label{display:block;font-size:16px;font-weight:700;margin:10px 0 7px}.mail-sheet fieldset button{background:transparent;border:1px solid #b6ae9d;border-radius:15px;margin:4px 7px 0 0;padding:7px 14px;color:#344b56}.mail-sheet fieldset button[aria-pressed=true]{background:#315467;color:#fff}
+.mail-sheet textarea,.mail-sheet input:not([type=file]){width:100%;background:#fffdf6;color:#283d47;border:1px solid #bfb5a4;border-radius:3px;padding:10px;font:16px/1.65 inherit;font-family:inherit;font-size:16px;line-height:1.65}.mail-sheet textarea{min-height:122px;resize:vertical}
+.mail-sheet .mail-upload{display:block;width:fit-content;border:1px dashed #968c77;padding:10px 13px;font-size:14px;color:#4e5a57;position:relative}.mail-upload input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.mail-upload:focus-within{outline:2px solid #315467}
+.post-office footer{font-size:12px;text-align:center;color:#665f52;padding:18px 0 0}.post-office #mailErr{font-size:14px;color:#994934}.post-office :is(button,h1,b,small){overflow-wrap:anywhere}
+.mail-address strong,.post-office h1{text-wrap:balance}
+</style>
 </html>
